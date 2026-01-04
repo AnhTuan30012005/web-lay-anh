@@ -11,7 +11,6 @@
     <style>
         :root {
             --bg-color: #0f172a;
-            /* Màu kính mờ: Rất trong và tối */
             --glass-bg: rgba(17, 25, 40, 0.75); 
             --glass-border: rgba(255, 255, 255, 0.125);
             --text-main: #e2e8f0;
@@ -21,7 +20,6 @@
         }
 
         body {
-            /* Hình nền Galaxy tối để làm nổi bật hiệu ứng kính */
             background-image: 
                 radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
                 radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
@@ -35,10 +33,9 @@
             padding: 30px 15px;
         }
 
-        /* --- CẤU TRÚC THẺ KÍNH (GLASS CARD) --- */
         .glass-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(16px); /* Tạo độ mờ kính */
+            backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
@@ -52,11 +49,9 @@
             border-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* --- TEXT & HEADINGS --- */
         h2, h3 { font-weight: 700; letter-spacing: -0.5px; }
         .text-accent { color: var(--accent-color); }
 
-        /* --- STATS CARD (Thẻ Thống Kê) --- */
         .stat-card {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100%;
@@ -64,7 +59,6 @@
         }
         .stat-number { font-size: 3.5rem; font-weight: 700; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; margin-bottom: 10px; }
 
-        /* --- SEARCH BOX --- */
         .search-wrapper { position: relative; }
         .search-input {
             width: 100%;
@@ -84,7 +78,6 @@
         }
         .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
-        /* --- TABLE STYLES (Quan trọng nhất) --- */
         .table-responsive { border-radius: 15px; }
         .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; color: var(--text-main); }
         
@@ -110,7 +103,6 @@
         .custom-table td:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
         .custom-table td:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 
-        /* --- THUMBNAIL & INFO --- */
         .thumb-container {
             width: 80px; height: 55px; border-radius: 10px; overflow: hidden;
             position: relative; border: 1px solid rgba(255,255,255,0.2);
@@ -121,7 +113,6 @@
         .folder-title { font-weight: 600; font-size: 1rem; color: #fff; margin-bottom: 4px; }
         .folder-meta { font-size: 0.8rem; color: var(--text-muted); font-family: monospace; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px; display: inline-block;}
 
-        /* --- BUTTONS --- */
         .btn-glass {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -147,7 +138,6 @@
             padding: 5px 12px; border-radius: 20px; font-weight: 500;
         }
 
-        /* --- LOADING --- */
         #loading {
             position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px);
             display: flex; justify-content: center; align-items: center; flex-direction: column; z-index: 1000;
@@ -159,6 +149,35 @@
         }
         @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* CSS cho nút bấm Glassmorphism lớn */
+        .glass-btn {
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 1px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            transition: all 0.3s ease;
+        }
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.4);
+            transform: translateY(-2px);
+            color: #fff;
+        }
+        .glass-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -174,9 +193,14 @@
                 <h2 class="mb-1">Quản Lý Kho Ảnh</h2>
                 <p class="text-muted m-0">Hệ thống đồng bộ dữ liệu thời gian thực</p>
             </div>
-            <button onclick="fetchData()" class="btn-glass mt-3 mt-md-0">
-                <i class="bi bi-arrow-clockwise"></i> Làm mới
-            </button>
+            <div class="d-flex align-items-center gap-3 mt-3 mt-md-0">
+                <button onclick="fetchData()" class="btn-glass" style="padding: 10px 20px; font-size: 16px;">
+                    <i class="bi bi-arrow-clockwise"></i> Làm mới
+                </button>
+                <a href="https://web-lay-anh.onrender.com/tcController" target="_blank" class="glass-btn">
+                    WEB lấy ảnh 
+                </a>
+            </div>
         </div>
 
         <div class="row g-4 mb-4">
@@ -249,6 +273,7 @@
             }
         }
 
+        // --- ĐÂY LÀ HÀM QUAN TRỌNG ĐÃ ĐƯỢC SỬA ---
         function renderTable(data) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
@@ -260,9 +285,8 @@
 
             data.forEach((item, index) => {
                 const tr = document.createElement('tr');
-                // Thêm animation delay cho từng dòng để xuất hiện mượt mà
                 tr.style.animation = `fadeInUp 0.3s ease forwards ${index * 0.05}s`;
-                tr.style.opacity = '0'; // Ban đầu ẩn đi
+                tr.style.opacity = '0'; 
 
                 let thumb = item.thumbnail && item.thumbnail.startsWith('http') 
                             ? `<img src="${item.thumbnail}" class="thumb-img" alt="thumb" loading="lazy">` 
@@ -271,6 +295,17 @@
                 let folderName = item.folderName || "Chưa xác định";
                 let linkId = item.link || item.id || "";
                 let displayId = linkId.length > 25 ? linkId.substring(0, 10) + '...' + linkId.slice(-8) : linkId;
+
+                // --- SỬA LOGIC LINK Ở ĐÂY ---
+                // 1. Tạo link Drive gốc
+                let driveLink = `https://drive.google.com/drive/folders/${linkId}`;
+                
+                // 2. Mã hóa link Drive để truyền an toàn trên URL (biến các dấu / : thành ký tự đặc biệt)
+                let encodedDriveLink = encodeURIComponent(driveLink);
+
+                // 3. Tạo link trỏ về Tool của bạn, kèm tham số txtLink
+                let toolUrl = `https://web-lay-anh.onrender.com/tcController?txtLink=${encodedDriveLink}&txtFilter=&action=view`;
+                // ---------------------------
 
                 tr.innerHTML = `
                     <td class="ps-4 text-nowrap text-gray">${item.time}</td>
@@ -285,8 +320,8 @@
                     </td>
                     <td class="text-center"><span class="badge-glass">${item.count}</span></td>
                     <td class="text-end pe-4">
-                        <a href="https://drive.google.com/drive/folders/${linkId}" target="_blank" class="btn-glass">
-                            <span>Mở Drive</span> <i class="bi bi-box-arrow-up-right"></i>
+                        <a href="${toolUrl}" target="_blank" class="btn-glass">
+                            <span>Xem Ảnh</span> <i class="bi bi-images"></i>
                         </a>
                     </td>
                 `;
@@ -303,7 +338,6 @@
             });
         }
 
-        // Hàm chạy hiệu ứng số nhảy
         function animateCounter(id, start, end, duration) {
             const obj = document.getElementById(id);
             let startTimestamp = null;
