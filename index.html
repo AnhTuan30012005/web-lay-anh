@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Creator Dashboard</title>
+    <title>Creator Dashboard V2</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* MÀU SẮC NEO-POP */
             --bg-color: #f0f0f0;
             --card-bg: #ffffff;
             --border-color: #000000;
@@ -19,6 +18,7 @@
             --accent-yellow: #fbbf24;
             --accent-pink: #ec4899;
             --accent-blue: #3b82f6;
+            --accent-gray: #64748b; /* Màu cho Free */
             
             --border-width: 3px;
             --shadow-hard: 5px 5px 0px 0px rgba(0,0,0,1);
@@ -27,7 +27,6 @@
 
         body {
             background-color: var(--bg-color);
-            /* Họa tiết giấy kẻ ô (Grid Paper) */
             background-image: radial-gradient(#000 1px, transparent 0);
             background-size: 20px 20px;
             font-family: 'Space Grotesk', sans-serif;
@@ -41,12 +40,6 @@
             border: var(--border-width) solid var(--border-color);
             box-shadow: var(--shadow-hard);
             border-radius: 12px;
-            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .neo-box:hover {
-            transform: translate(3px, 3px);
-            box-shadow: var(--shadow-hover);
         }
 
         .neo-input {
@@ -73,23 +66,18 @@
             padding: 10px 20px;
             border-radius: 8px;
             box-shadow: var(--shadow-hard);
-            position: relative;
-            top: 0; left: 0;
             transition: 0.2s;
         }
         .neo-btn:active {
-            top: 4px; left: 4px;
+            transform: translate(2px, 2px);
             box-shadow: 1px 1px 0 0 #000;
         }
         
         .neo-btn.yellow { background: var(--accent-yellow); color: black; }
-        .neo-btn.green { background: var(--accent-green); color: black; }
-        .neo-btn.pink { background: var(--accent-pink); color: white; }
 
         /* --- STATS CARDS --- */
         .stat-card {
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
             min-height: 140px;
             display: flex; flex-direction: column; justify-content: center;
         }
@@ -98,7 +86,7 @@
             font-size: 8rem; opacity: 0.1; transform: rotate(-15deg);
         }
 
-        /* --- ORDER TICKET (CARD) --- */
+        /* --- TICKET CARD --- */
         .ticket-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -114,16 +102,16 @@
             box-shadow: var(--shadow-hard);
             transition: 0.3s;
         }
-        .ticket-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
-        }
+        
+        /* Màu nền nhạt cho các loại thẻ */
+        .ticket-card.is-free { background: #f1f5f9; } /* Xám nhạt */
+        .ticket-card.is-paid { background: #f0fdf4; } /* Xanh nhạt */
 
         .ticket-header {
             padding: 15px;
             border-bottom: var(--border-width) solid black;
             display: flex; align-items: center; gap: 15px;
-            background: #fff;
+            background: rgba(255,255,255,0.5);
         }
         
         .ticket-thumb {
@@ -134,11 +122,7 @@
             background: #eee;
         }
 
-        .ticket-body {
-            padding: 15px;
-            flex-grow: 1;
-            background: #fafafa;
-        }
+        .ticket-body { padding: 15px; flex-grow: 1; }
 
         .ticket-footer {
             padding: 15px;
@@ -154,42 +138,91 @@
             font-weight: 700;
             font-size: 0.8rem;
             text-transform: uppercase;
-        }
-        
-        .status-toggle {
             cursor: pointer;
             user-select: none;
             transition: 0.3s;
         }
-        .status-toggle:hover { transform: scale(1.05); }
+        .tag-pill:hover { transform: scale(1.05); }
 
         /* STATUS COLORS */
         .st-unpaid { background: #fee2e2; color: #ef4444; }
         .st-paid { background: #dcfce7; color: #16a34a; }
+        .st-free { background: #e2e8f0; color: #475569; text-decoration: line-through; }
 
-        /* --- LOADING & LOGIN --- */
+        /* --- STATUS SELECTION MODAL --- */
+        #statusModal {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            display: none;
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            width: 90%; max-width: 350px;
+            background: white;
+            border: 4px solid black;
+            box-shadow: 10px 10px 0 0 white;
+            padding: 0;
+            border-radius: 16px;
+            overflow: hidden;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .status-option {
+            padding: 20px;
+            border-bottom: 2px solid black;
+            font-weight: 700; font-size: 1.2rem;
+            text-transform: uppercase;
+            cursor: pointer; transition: 0.2s;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .status-option:last-child { border-bottom: none; }
+        .status-option:hover { background: #f0f0f0; padding-left: 30px; }
+        
+        .opt-paid { color: #16a34a; }
+        .opt-unpaid { color: #ef4444; }
+        .opt-free { color: #64748b; }
+
+        /* --- TOAST --- */
+        .neo-toast {
+            position: fixed; top: 20px; right: 20px; z-index: 10001;
+            background: white; border: 3px solid black;
+            padding: 15px 25px; box-shadow: 6px 6px 0 0 black;
+            font-weight: 700; transform: translateX(150%);
+            transition: 0.4s;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .neo-toast.show { transform: translateX(0); }
+
+        /* Loading & Login */
         #loginOverlay {
             position: fixed; inset: 0; background: var(--bg-color); z-index: 9999;
             background-image: radial-gradient(#000 1px, transparent 0); background-size: 20px 20px;
             display: flex; justify-content: center; align-items: center;
         }
-
-        /* --- TOAST --- */
-        .neo-toast {
-            position: fixed; top: 20px; right: 20px; z-index: 10000;
-            background: white; border: 3px solid black;
-            padding: 15px 25px; box-shadow: 6px 6px 0 0 black;
-            font-weight: 700; transform: translateX(150%);
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex; align-items: center; gap: 10px;
-        }
-        .neo-toast.show { transform: translateX(0); }
-        .neo-toast.success { background: #dcfce7; }
-        .neo-toast.error { background: #fee2e2; }
-
     </style>
 </head>
 <body>
+
+    <div id="statusModal" onclick="closeStatusModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="p-3 bg-black text-white fw-bold text-center text-uppercase">Chọn trạng thái mới</div>
+            <div class="status-option opt-paid" onclick="confirmUpdate('Đã thanh toán')">
+                <span><i class="bi bi-check-circle-fill"></i> Đã thanh toán</span>
+            </div>
+            <div class="status-option opt-unpaid" onclick="confirmUpdate('Chưa thanh toán')">
+                <span><i class="bi bi-exclamation-circle-fill"></i> Chưa thanh toán</span>
+            </div>
+            <div class="status-option opt-free" onclick="confirmUpdate('Không lấy tiền')">
+                <span><i class="bi bi-gift-fill"></i> Không lấy tiền (Free)</span>
+            </div>
+            <div class="p-3 text-center bg-light border-top border-dark fw-bold text-secondary" onclick="closeStatusModal()" style="cursor:pointer">
+                HỦY BỎ
+            </div>
+        </div>
+    </div>
 
     <div id="toast" class="neo-toast">
         <i class="bi bi-bell-fill"></i> <span id="toastMsg">Notification</span>
@@ -210,7 +243,7 @@
         <nav class="navbar sticky-top" style="background: rgba(240,240,240,0.9); backdrop-filter: blur(10px); border-bottom: 3px solid black;">
             <div class="container py-2">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="bg-black text-white px-3 py-1 fw-bold rounded-2">ADMIN</div>
+                    <div class="bg-black text-white px-3 py-1 fw-bold rounded-2">V2</div>
                     <span class="fw-bold d-none d-md-block">Quản Lý Đơn Hàng</span>
                 </div>
                 <div class="d-flex gap-2">
@@ -221,11 +254,10 @@
         </nav>
 
         <div class="container py-4">
-            
             <div class="row g-4 mb-5">
                 <div class="col-md-4">
                     <div class="neo-box stat-card p-4" style="background: var(--accent-purple); color: white;">
-                        <span class="fw-bold opacity-75">DOANH THU</span>
+                        <span class="fw-bold opacity-75">DOANH THU THỰC</span>
                         <h2 class="display-5 fw-bold mb-0" id="statRevenue">0đ</h2>
                         <i class="bi bi-currency-dollar stat-icon"></i>
                     </div>
@@ -239,7 +271,7 @@
                 </div>
                 <div class="col-6 col-md-4">
                     <div class="neo-box stat-card p-4" style="background: var(--accent-pink); color: white;">
-                        <span class="fw-bold opacity-75">CHƯA TT</span>
+                        <span class="fw-bold opacity-75">CHƯA THU</span>
                         <h2 class="display-5 fw-bold mb-0" id="statUnpaid">0</h2>
                         <i class="bi bi-exclamation-triangle stat-icon"></i>
                     </div>
@@ -252,15 +284,16 @@
                         <label class="fw-bold small text-uppercase mb-1">Tìm kiếm</label>
                         <div class="input-group">
                             <span class="input-group-text bg-white border-dark border-3 rounded-start border-end-0"><i class="bi bi-search"></i></span>
-                            <input type="text" id="searchId" class="form-control neo-input border-start-0 rounded-end" placeholder="Nhập tên, ID, link..." onkeyup="renderData()">
+                            <input type="text" id="searchId" class="form-control neo-input border-start-0 rounded-end" placeholder="Tên, ID, Link..." onkeyup="renderData()">
                         </div>
                     </div>
                     <div class="col-6 col-md-3">
-                        <label class="fw-bold small text-uppercase mb-1">Trạng thái</label>
+                        <label class="fw-bold small text-uppercase mb-1">Lọc Trạng thái</label>
                         <select id="filterStatus" class="form-select neo-input" onchange="renderData()">
                             <option value="all">Tất cả</option>
                             <option value="unpaid">Chưa thanh toán</option>
                             <option value="paid">Đã thanh toán</option>
+                            <option value="free">Không lấy tiền</option>
                         </select>
                     </div>
                     <div class="col-6 col-md-3 d-flex align-items-end">
@@ -288,23 +321,27 @@
     </div>
 
     <script>
+        // --- CẤU HÌNH ---
         const API_URL = "https://script.google.com/macros/s/AKfycbxd8IxMapCIxdAGCZdz2Lsr9aIJYMcdmFI7Tl1eXJbMpmr-qHd8Tn3es2Gj-5zXxInr/exec";
         const JAVA_SERVER_URL = "https://web-lay-anh.onrender.com/tcController";
         const ADMIN_PASS = "3001";
+        // ----------------
 
         let rawData = [];
+        let currentEditingRow = null;
 
         window.onload = function() {
             if(sessionStorage.getItem('isLoggedIn') === 'true') showDashboard();
         };
 
-        function showToast(msg, type = 'success') {
+        function showToast(msg) {
             const el = document.getElementById('toast');
             document.getElementById('toastMsg').innerText = msg;
-            el.className = `neo-toast show ${type}`;
+            el.classList.add('show');
             setTimeout(() => el.classList.remove('show'), 3000);
         }
 
+        // --- AUTH ---
         function checkLogin() {
             if (document.getElementById('adminPass').value === ADMIN_PASS) {
                 sessionStorage.setItem('isLoggedIn', 'true');
@@ -314,15 +351,14 @@
                 document.getElementById('loginMsg').innerText = "SAI MẬT KHẨU!";
             }
         }
-
         function logout() { sessionStorage.removeItem('isLoggedIn'); location.reload(); }
-
         function showDashboard() {
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('dashboardContent').style.display = 'block';
             loadData();
         }
 
+        // --- DATA LOGIC ---
         function loadData() {
             document.getElementById('loading').style.display = 'block';
             document.getElementById('gridContainer').innerHTML = '';
@@ -336,7 +372,7 @@
                     showToast("Đã cập nhật dữ liệu");
                 })
                 .catch(err => {
-                    alert("Lỗi: " + err);
+                    alert("Lỗi tải data: " + err);
                     document.getElementById('loading').style.display = 'none';
                 });
         }
@@ -348,21 +384,23 @@
         }
 
         function renderData() {
-            const status = document.getElementById('filterStatus').value;
+            const filterStatus = document.getElementById('filterStatus').value;
             let search = document.getElementById('searchId').value.trim().toLowerCase();
             if(search.includes("drive.google.com")) search = getDriveId(search).toLowerCase();
 
-            // 1. Filter
+            // 1. Lọc
             let data = rawData.filter(item => {
                 const nameMatch = item.name && item.name.toLowerCase().includes(search);
                 const idMatch = item.id.toLowerCase().includes(search);
                 if (search && !nameMatch && !idMatch) return false;
-                if (status === 'unpaid' && item.status !== 'Chưa thanh toán') return false;
-                if (status === 'paid' && item.status !== 'Đã thanh toán') return false;
+                
+                if (filterStatus === 'unpaid' && item.status !== 'Chưa thanh toán') return false;
+                if (filterStatus === 'paid' && item.status !== 'Đã thanh toán') return false;
+                if (filterStatus === 'free' && item.status !== 'Không lấy tiền') return false;
                 return true;
             });
 
-            // 2. Group
+            // 2. Gộp ID trùng
             if (document.getElementById('checkGroup').checked) {
                 const map = new Map();
                 data.forEach(item => {
@@ -371,95 +409,121 @@
                         let ex = map.get(item.id);
                         ex.qty = parseInt(ex.qty) + parseInt(item.qty);
                         ex.money = parseInt(ex.money) + parseInt(item.money);
+                        // Nếu item mới nhất có status khác, ưu tiên hiển thị status mới nhất
+                        ex.status = item.status; 
                         if(item.name && item.name !== "Không xác định") ex.name = item.name;
-                        if (item.status === 'Chưa thanh toán') ex.status = 'Chưa thanh toán';
                         ex.originalRows.push(item.rowIndex);
                     }
                 });
                 data = Array.from(map.values());
             }
 
-            // 3. Stats & Render Grid
+            // 3. Tính toán và Render
             let totalRev = 0, totalQty = 0, totalUnpaid = 0;
             const container = document.getElementById('gridContainer');
             container.innerHTML = '';
 
-            if (data.length === 0) { document.getElementById('emptyState').classList.remove('d-none'); } 
-            else {
-                document.getElementById('emptyState').classList.add('d-none');
-                
-                data.forEach(item => {
-                    totalRev += parseInt(item.money); 
-                    totalQty += parseInt(item.qty);
-                    if (item.status === 'Chưa thanh toán') totalUnpaid++;
+            if (data.length === 0) document.getElementById('emptyState').classList.remove('d-none');
+            else document.getElementById('emptyState').classList.add('d-none');
 
-                    const isPaid = item.status === 'Đã thanh toán';
-                    const link = `${JAVA_SERVER_URL}?action=view&txtLink=${encodeURIComponent(item.id)}`;
-                    const date = new Date(item.time);
-                    const timeStr = date.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + ' ' + date.toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit'});
+            data.forEach(item => {
+                // LOGIC QUAN TRỌNG: TÍNH TIỀN
+                let displayMoney = parseInt(item.money);
+                let isFree = (item.status === 'Không lấy tiền');
+                let isPaid = (item.status === 'Đã thanh toán');
 
-                    let displayName = "No Name";
-                    if(item.name && item.name !== "Không xác định" && !item.name.startsWith("http")) displayName = item.name;
+                totalQty += parseInt(item.qty);
 
-                    // Tạo thẻ HTML cho Card
-                    const card = document.createElement('div');
-                    card.className = 'ticket-card';
-                    card.innerHTML = `
-                        <div class="ticket-header">
-                            <a href="${link}" target="_blank">
-                                <img src="${item.thumb}" class="ticket-thumb" onerror="this.src='https://ui-avatars.com/api/?name=IMG&background=random'">
-                            </a>
-                            <div class="overflow-hidden">
-                                <a href="${link}" target="_blank" class="fw-bold text-dark text-decoration-none text-truncate d-block fs-5">${displayName}</a>
-                                <div class="text-secondary small font-monospace text-truncate">${item.id}</div>
-                                <div class="badge bg-light text-dark border border-dark mt-1">${timeStr}</div>
-                            </div>
+                if (isFree) {
+                    displayMoney = 0; // Không tính tiền vào tổng
+                } else {
+                    totalRev += parseInt(item.money); // Chỉ cộng nếu không Free
+                    if (!isPaid) totalUnpaid++; // Chỉ đếm nợ nếu chưa trả và không Free
+                }
+
+                // Giao diện thẻ
+                const link = `${JAVA_SERVER_URL}?action=view&txtLink=${encodeURIComponent(item.id)}`;
+                const date = new Date(item.time);
+                const timeStr = date.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + ' ' + date.toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit'});
+                let displayName = (item.name && item.name !== "Không xác định" && !item.name.startsWith("http")) ? item.name : "No Name";
+
+                // CSS Class cho trạng thái
+                let statusClass = 'st-unpaid';
+                let cardClass = '';
+                if(isPaid) { statusClass = 'st-paid'; cardClass = 'is-paid'; }
+                if(isFree) { statusClass = 'st-free'; cardClass = 'is-free'; }
+
+                const card = document.createElement('div');
+                card.className = `ticket-card ${cardClass}`;
+                card.innerHTML = `
+                    <div class="ticket-header">
+                        <a href="${link}" target="_blank">
+                            <img src="${item.thumb}" class="ticket-thumb" onerror="this.src='https://ui-avatars.com/api/?name=IMG&background=random'">
+                        </a>
+                        <div class="overflow-hidden">
+                            <a href="${link}" target="_blank" class="fw-bold text-dark text-decoration-none text-truncate d-block fs-5">${displayName}</a>
+                            <div class="text-secondary small font-monospace text-truncate">${item.id}</div>
+                            <div class="badge bg-white text-dark border border-dark mt-1">${timeStr}</div>
                         </div>
-                        <div class="ticket-body d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="small text-muted fw-bold">SỐ LƯỢNG</div>
-                                <div class="fs-4 fw-bold">${item.qty}</div>
-                            </div>
-                            <div class="text-end">
-                                <div class="small text-muted fw-bold">THÀNH TIỀN</div>
-                                <div class="fs-4 fw-bold text-primary">${parseInt(item.money).toLocaleString('vi-VN')} đ</div>
-                            </div>
+                    </div>
+                    <div class="ticket-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small text-muted fw-bold">SỐ LƯỢNG</div>
+                            <div class="fs-4 fw-bold">${item.qty}</div>
                         </div>
-                        <div class="ticket-footer">
-                            <a href="${link}" target="_blank" class="btn btn-sm btn-outline-dark fw-bold"><i class="bi bi-eye-fill"></i> Xem</a>
-                            <div class="status-toggle tag-pill ${isPaid ? 'st-paid' : 'st-unpaid'}" 
-                                 onclick="updateStatus(${item.rowIndex}, '${item.status}', this)">
-                                ${isPaid ? 'ĐÃ THANH TOÁN' : 'CHƯA THANH TOÁN'}
+                        <div class="text-end">
+                            <div class="small text-muted fw-bold">GIÁ TRỊ</div>
+                            <div class="fs-4 fw-bold ${isFree ? 'text-decoration-line-through text-muted' : 'text-primary'}">
+                                ${parseInt(item.money).toLocaleString('vi-VN')} đ
                             </div>
+                            ${isFree ? '<div class="small fw-bold text-secondary">FREE (0đ)</div>' : ''}
                         </div>
-                    `;
-                    container.appendChild(card);
-                });
-            }
+                    </div>
+                    <div class="ticket-footer">
+                        <a href="${link}" target="_blank" class="btn btn-sm btn-outline-dark fw-bold"><i class="bi bi-eye-fill"></i> Xem</a>
+                        <div class="tag-pill ${statusClass}" onclick="openStatusModal(${item.rowIndex})">
+                            ${item.status.toUpperCase()}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
 
             document.getElementById('statRevenue').innerText = totalRev.toLocaleString('vi-VN') + 'đ';
             document.getElementById('statQty').innerText = totalQty;
             document.getElementById('statUnpaid').innerText = totalUnpaid;
         }
 
-        function updateStatus(rowIndex, currentStatus, el) {
-            const newStatus = currentStatus === 'Chưa thanh toán' ? 'Đã thanh toán' : 'Chưa thanh toán';
-            if (!confirm(`Đổi trạng thái thành: ${newStatus.toUpperCase()}?`)) return;
+        // --- UPDATE STATUS LOGIC ---
+        function openStatusModal(rowIndex) {
+            currentEditingRow = rowIndex;
+            const modal = document.getElementById('statusModal');
+            modal.style.display = 'flex';
+        }
 
-            const originalText = el.innerText;
-            el.innerText = "...";
-            el.style.opacity = "0.5";
+        function closeStatusModal() {
+            document.getElementById('statusModal').style.display = 'none';
+            currentEditingRow = null;
+        }
 
-            fetch(API_URL + "?action=updatePayment&rowIndex=" + rowIndex + "&status=" + encodeURIComponent(newStatus), { method: 'GET' })
+        function confirmUpdate(newStatus) {
+            if (currentEditingRow === null) return;
+            
+            closeStatusModal();
+            showToast("Đang cập nhật...", "info");
+
+            // Gửi lên server
+            fetch(API_URL + "?action=updatePayment&rowIndex=" + currentEditingRow + "&status=" + encodeURIComponent(newStatus), { method: 'GET' })
             .then(res => res.json())
             .then(() => {
-                showToast("Cập nhật thành công!");
-                loadData();
+                showToast("Đã cập nhật thành công!");
+                // Cập nhật lại dữ liệu local để đỡ phải load lại trang
+                let row = rawData.find(r => r.rowIndex === currentEditingRow);
+                if(row) row.status = newStatus;
+                renderData(); // Vẽ lại giao diện
             })
             .catch(err => {
-                alert('Lỗi: ' + err);
-                el.innerText = originalText;
-                el.style.opacity = "1";
+                alert('Lỗi cập nhật: ' + err);
             });
         }
     </script>
