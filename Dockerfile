@@ -1,7 +1,7 @@
 # Sử dụng Tomcat 9 nhưng chạy trên nền Java 17 (để sửa lỗi version 61.0)
 FROM tomcat:9.0-jdk17-openjdk-slim
 
-# Build version: 2026-10-02-Admin-PIN-Fix
+# Build version: 2026-10-02-JSP-EL-Ignored-Fix
 RUN rm -rf /usr/local/tomcat/webapps/*
 
 # Copy file WAR từ GitHub vào thư mục chạy web
