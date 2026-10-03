@@ -254,31 +254,37 @@ function handleRequest(e, method) {
     }
 
     // -------------------------------------------------------------
-    // 6. CẬP NHẬT ALBUM (TƯƠNG THÍCH CODE CŨ CỦA BẠN)
+    // 6. CẬP NHẬT ALBUM (SỬA TÊN, ID, SĐT, GHI CHÚ, THUMBNAIL)
     // -------------------------------------------------------------
-    if (action === "updateAlbum") {
+    if (action === "updateAlbum" || action === "update_album") {
       const sheet = getOrCreateAlbumsSheet(ss);
       const rowIndex = parseInt(payload.rowIndex || e.parameter.rowIndex, 10);
       const newName = payload.name || e.parameter.name || "";
+      const newId = payload.id || e.parameter.id || "";
       const newThumb = payload.thumb || e.parameter.thumb || "";
+      const newPhone = payload.phone || e.parameter.phone || "";
+      const newNote = payload.note !== undefined ? (payload.note || e.parameter.note) : undefined;
 
       if (rowIndex && rowIndex > 1 && rowIndex <= sheet.getLastRow()) {
+        if (newId) sheet.getRange(rowIndex, 2).setValue(newId);
         if (newName) sheet.getRange(rowIndex, 3).setValue(newName);
         if (newThumb) sheet.getRange(rowIndex, 4).setValue(newThumb);
-        return jsonResponse({ status: "success", message: "Đã cập nhật album!" });
+        if (newPhone) sheet.getRange(rowIndex, 7).setValue("'" + newPhone);
+        if (newNote !== undefined) sheet.getRange(rowIndex, 8).setValue(newNote);
+        return jsonResponse({ status: "success", message: "Đã cập nhật album thành công!" });
       }
       return jsonResponse({ status: "error", message: "Không tìm thấy hàng cần sửa!" });
     }
 
     // -------------------------------------------------------------
-    // 7. XÓA ALBUM
+    // 7. XÓA ALBUM KHỎI GOOGLE SHEETS
     // -------------------------------------------------------------
-    if (action === "deleteAlbum") {
+    if (action === "deleteAlbum" || action === "delete_album") {
       const sheet = getOrCreateAlbumsSheet(ss);
       const rowIndex = parseInt(payload.rowIndex || e.parameter.rowIndex, 10);
       if (rowIndex && rowIndex > 1 && rowIndex <= sheet.getLastRow()) {
         sheet.deleteRow(rowIndex);
-        return jsonResponse({ status: "success", message: "Đã xóa album!" });
+        return jsonResponse({ status: "success", message: "Đã xóa album thành công!" });
       }
       return jsonResponse({ status: "error", message: "Không tìm thấy hàng cần xóa!" });
     }
