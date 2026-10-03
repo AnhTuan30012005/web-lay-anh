@@ -156,6 +156,39 @@ function handleRequest(e, method) {
     }
 
     // -------------------------------------------------------------
+    // 3B. CẬP NHẬT THÔNG TIN ĐƠN HÀNG (SỬA TÊN, SĐT, GHI CHÚ, TRẠNG THÁI)
+    // -------------------------------------------------------------
+    if (action === "update_order") {
+      const sheet = getOrCreateOrdersSheet(ss);
+      const rowIndex = parseInt(payload.rowIndex || e.parameter.rowIndex, 10);
+      if (rowIndex && rowIndex > 1 && rowIndex <= sheet.getLastRow()) {
+        const name = payload.name || e.parameter.name;
+        const phone = payload.phone || e.parameter.phone;
+        const note = payload.note !== undefined ? (payload.note || e.parameter.note) : undefined;
+        const status = payload.status || e.parameter.status;
+        if (name) sheet.getRange(rowIndex, 3).setValue(name);
+        if (phone) sheet.getRange(rowIndex, 4).setValue("'" + phone);
+        if (note !== undefined) sheet.getRange(rowIndex, 9).setValue(note);
+        if (status) sheet.getRange(rowIndex, 10).setValue(status);
+        return jsonResponse({ status: "success", message: "Đã cập nhật đơn hàng thành công!" });
+      }
+      return jsonResponse({ status: "error", message: "Không tìm thấy hàng cần sửa!" });
+    }
+
+    // -------------------------------------------------------------
+    // 3C. XÓA ĐƠN HÀNG KHỎI GOOGLE SHEETS
+    // -------------------------------------------------------------
+    if (action === "delete_order") {
+      const sheet = getOrCreateOrdersSheet(ss);
+      const rowIndex = parseInt(payload.rowIndex || e.parameter.rowIndex, 10);
+      if (rowIndex && rowIndex > 1 && rowIndex <= sheet.getLastRow()) {
+        sheet.deleteRow(rowIndex);
+        return jsonResponse({ status: "success", message: "Đã xóa đơn hàng thành công!" });
+      }
+      return jsonResponse({ status: "error", message: "Không tìm thấy hàng cần xóa!" });
+    }
+
+    // -------------------------------------------------------------
     // 4. LẤY DỮ LIỆU ALBUM (TƯƠNG THÍCH HOÀN TOÀN GETADMINDATA CŨ)
     // -------------------------------------------------------------
     if (action === "getAdminData" || action === "get_albums") {
