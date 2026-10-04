@@ -1,7 +1,7 @@
 # Sử dụng Tomcat 9 nhưng chạy trên nền Java 17 (để sửa lỗi version 61.0)
 FROM tomcat:9.0-jdk17-openjdk-slim
 
-# Build version: 2026-10-04-Responsive-All-Devices-Note-Album-Picks
+# Build version: 2026-10-04-Fix-Album-Picks-Button-Contrast-Uniform-Height
 RUN rm -rf /usr/local/tomcat/webapps/*
 
 # Copy file WAR từ GitHub vào thư mục chạy web
