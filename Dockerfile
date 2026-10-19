@@ -1,11 +1,16 @@
 # Sử dụng Tomcat 9 với Java 17 Temurin (đã fix lỗi cgroup v2 của bản openjdk-slim cũ)
 FROM tomcat:9.0-jdk17-temurin
 
-# Build version: 2026-10-19-Fix-404-Servlet-Mapping
+# Build version: 2026-10-19-Pre-Extract-ROOT-Webapp
 RUN rm -rf /usr/local/tomcat/webapps/*
 
-# Copy file WAR vào thư mục chạy web
-COPY ROOT.war /usr/local/tomcat/webapps/ROOT.war
+# Giải nén trực tiếp ROOT.war vào /usr/local/tomcat/webapps/ROOT khi build Docker
+COPY ROOT.war /tmp/ROOT.war
+RUN mkdir -p /usr/local/tomcat/webapps/ROOT && \
+    cd /usr/local/tomcat/webapps/ROOT && \
+    jar -xf /tmp/ROOT.war && \
+    rm -f /tmp/ROOT.war && \
+    rm -f /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/servlet-api.jar
 
 # -XX:-UseContainerSupport: Bỏ qua đọc cgroup để sửa triệt để lỗi NullPointerException CgroupInfo trên Render/Linux
 # -Xms64m -Xmx320m: Giới hạn heap an toàn trong 512MB RAM Free tier
