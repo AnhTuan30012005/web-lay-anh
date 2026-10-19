@@ -1,14 +1,17 @@
-# Sử dụng Tomcat 9 nhưng chạy trên nền Java 17 (để sửa lỗi version 61.0)
-FROM tomcat:9.0-jdk17-openjdk-slim
+# Sử dụng Tomcat 9 với Java 17 Temurin (đã fix lỗi cgroup v2 của bản openjdk-slim cũ)
+FROM tomcat:9.0-jdk17-temurin
 
-# Build version: 2026-10-19-Fix-Render-OOM-Port
+# Build version: 2026-10-19-Fix-Cgroup-NPE-And-Port
 RUN rm -rf /usr/local/tomcat/webapps/*
 
 # Copy file WAR vào thư mục chạy web
 COPY ROOT.war /usr/local/tomcat/webapps/ROOT.war
 
-# Giới hạn heap JVM: tránh OOM trên Render Free tier (512MB RAM)
-ENV JAVA_OPTS="-Xms64m -Xmx320m -XX:+UseSerialGC -Djava.security.egd=file:/dev/./urandom"
+# -XX:-UseContainerSupport: Bỏ qua đọc cgroup để sửa triệt để lỗi NullPointerException CgroupInfo trên Render/Linux
+# -Xms64m -Xmx320m: Giới hạn heap an toàn trong 512MB RAM Free tier
+# -XX:+UseSerialGC: Tiết kiệm RAM
+# -Djava.security.egd: Tránh treo khởi tạo SecureRandom
+ENV JAVA_OPTS="-XX:-UseContainerSupport -Xms64m -Xmx320m -XX:+UseSerialGC -Djava.security.egd=file:/dev/./urandom"
 
 # Mở cả cổng 8080 và 10000
 EXPOSE 8080 10000
