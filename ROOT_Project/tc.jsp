@@ -1125,20 +1125,11 @@
                                                 <div class="row g-3">
                                                     <%
                                                         for (String albStr : studioAlbums) {
-                                                            String albId = "";
-                                                            String albName = "Album Mới";
-                                                            String albThumb = "";
-                                                            int albQty = 0;
-                                                            java.util.regex.Matcher mId = java.util.regex.Pattern.compile(""id"\\s*:\\s*"([^"]+)"").matcher(albStr);
-                                                            if (mId.find()) albId = mId.group(1);
-                                                            java.util.regex.Matcher mName = java.util.regex.Pattern.compile(""name"\\s*:\\s*"([^"]+)"").matcher(albStr);
-                                                            if (mName.find()) albName = mName.group(1);
-                                                            java.util.regex.Matcher mThumb = java.util.regex.Pattern.compile(""thumb"\\s*:\\s*"([^"]+)"").matcher(albStr);
-                                                            if (mThumb.find()) albThumb = mThumb.group(1);
-                                                            java.util.regex.Matcher mQty = java.util.regex.Pattern.compile(""qty"\\s*:\\s*([0-9]+)").matcher(albStr);
-                                                            if (mQty.find()) {
-                                                                try { albQty = Integer.parseInt(mQty.group(1)); } catch (Exception ignored) {}
-                                                            }
+                                                            String albId = Controller.tcController.extractJsonField(albStr, "id");
+                                                            String albName = Controller.tcController.extractJsonField(albStr, "name");
+                                                            String albThumb = Controller.tcController.extractJsonField(albStr, "thumb");
+                                                            int albQty = Controller.tcController.extractJsonInt(albStr, "qty", 0);
+                                                            if (albName == null || albName.isEmpty()) albName = "Album Mới";
                                                             if (albThumb == null || albThumb.isEmpty()) albThumb = "tuan.jpg";
                                                     %>
                                                     <div class="col-6 col-md-4 col-lg-3">

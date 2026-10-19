@@ -330,14 +330,14 @@ public class tcController extends HttpServlet {
         return r;
     }
 
-    private static String extractJsonField(String json, String field) {
+    public static String extractJsonField(String json, String field) {
         Pattern p = Pattern.compile("\"" + Pattern.quote(field) + "\"\\s*:\\s*\"((?:\\\\.|[^\"\\\\])*)\"");
         Matcher m = p.matcher(json);
         if (m.find()) return unescapeJson(m.group(1));
         return "";
     }
 
-    private static int extractJsonInt(String json, String field, int defaultVal) {
+    public static int extractJsonInt(String json, String field, int defaultVal) {
         Pattern p = Pattern.compile("\"" + Pattern.quote(field) + "\"\\s*:\\s*([0-9]+)");
         Matcher m = p.matcher(json);
         if (m.find()) {
