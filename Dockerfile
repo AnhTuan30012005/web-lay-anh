@@ -1,7 +1,7 @@
 # Sử dụng Tomcat 9 với Java 17 Temurin (đã fix lỗi cgroup v2 của bản openjdk-slim cũ)
 FROM tomcat:9.0-jdk17-temurin
 
-# Build version: 2026-10-19-Fix-Cgroup-NPE-And-Port
+# Build version: 2026-10-19-Fix-404-Servlet-Mapping
 RUN rm -rf /usr/local/tomcat/webapps/*
 
 # Copy file WAR vào thư mục chạy web
