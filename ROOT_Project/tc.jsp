@@ -1088,8 +1088,8 @@
                                             </div>
                                         </div>
 
-                                        <% } else if (request.getAttribute("currentId") !=null) { %>
-                                            <!-- Not Found State / Hỗ trợ thử lại tự động -->
+                                        <% } else if (hasCurrentAlbum) { %>
+                                            <!-- Not Found State / Hỗ trợ thử lại tự động khi ID hợp lệ nhưng Drive chưa trả về ảnh -->
                                             <div class="glass-panel text-center py-5">
                                                 <div class="mb-3">
                                                     <i class="bi bi-cloud-arrow-down-fill text-info" style="font-size: 52px; opacity: 0.85;"></i>
@@ -1107,7 +1107,65 @@
                                                     </a>
                                                 </div>
                                             </div>
-                                            <% } %>
+                                        <% } else { 
+                                            List<String> studioAlbums = (List<String>) request.getAttribute("studioAlbums");
+                                            if (studioAlbums != null && !studioAlbums.isEmpty()) {
+                                        %>
+                                            <!-- Khi chưa dán ID: Hiển thị trọn vẹn Kho Album Mẫu của Studio Tuấn Hoa -->
+                                            <div class="mt-4 mb-5">
+                                                <div class="d-flex align-items-center justify-content-between mb-3 px-1">
+                                                    <h5 class="text-white fw-bold m-0 d-flex align-items-center">
+                                                        <i class="bi bi-collection-play-fill text-warning me-2 fs-5"></i>
+                                                        Kho Album Ảnh Studio Tuấn Hoa
+                                                    </h5>
+                                                    <span class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-30 rounded-pill px-3 py-1">
+                                                        <%= studioAlbums.size() %> Album
+                                                    </span>
+                                                </div>
+                                                <div class="row g-3">
+                                                    <%
+                                                        for (String albStr : studioAlbums) {
+                                                            String albId = "";
+                                                            String albName = "Album Mới";
+                                                            String albThumb = "";
+                                                            int albQty = 0;
+                                                            java.util.regex.Matcher mId = java.util.regex.Pattern.compile(""id"\\s*:\\s*"([^"]+)"").matcher(albStr);
+                                                            if (mId.find()) albId = mId.group(1);
+                                                            java.util.regex.Matcher mName = java.util.regex.Pattern.compile(""name"\\s*:\\s*"([^"]+)"").matcher(albStr);
+                                                            if (mName.find()) albName = mName.group(1);
+                                                            java.util.regex.Matcher mThumb = java.util.regex.Pattern.compile(""thumb"\\s*:\\s*"([^"]+)"").matcher(albStr);
+                                                            if (mThumb.find()) albThumb = mThumb.group(1);
+                                                            java.util.regex.Matcher mQty = java.util.regex.Pattern.compile(""qty"\\s*:\\s*([0-9]+)").matcher(albStr);
+                                                            if (mQty.find()) {
+                                                                try { albQty = Integer.parseInt(mQty.group(1)); } catch (Exception ignored) {}
+                                                            }
+                                                            if (albThumb == null || albThumb.isEmpty()) albThumb = "tuan.jpg";
+                                                    %>
+                                                    <div class="col-6 col-md-4 col-lg-3">
+                                                        <a href="tcController?txtLink=<%= URLEncoder.encode(albId, "UTF-8") %>&action=view" class="text-decoration-none">
+                                                            <div class="glass-panel p-2 h-100 hover-card" style="border-radius: 16px; transition: all 0.25s ease; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.05);">
+                                                                <div style="position: relative; width: 100%; aspect-ratio: 1/1; border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.4);">
+                                                                    <img src="<%= albThumb %>" alt="<%= escapeHtml(albName) %>" loading="lazy"
+                                                                        style="width: 100%; height: 100%; object-fit: cover;"
+                                                                        onerror="this.src='tuan.jpg'">
+                                                                    <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 end-0 m-2 rounded-pill px-2 py-1 shadow-sm" style="font-size: 11px;">
+                                                                        <i class="bi bi-images me-1 text-info"></i><%= albQty %> ảnh
+                                                                    </span>
+                                                                </div>
+                                                                <div class="mt-2 px-1">
+                                                                    <div class="text-white fw-semibold text-truncate" style="font-size: 0.92rem;"><%= escapeHtml(albName) %></div>
+                                                                    <div class="text-white-50 small mt-1 d-flex align-items-center justify-content-between" style="font-size: 12px;">
+                                                                        <span>Mở xem ảnh</span>
+                                                                        <i class="bi bi-arrow-right-circle-fill text-info"></i>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        <% } } %>
 
                         </div>
 
@@ -1245,7 +1303,7 @@
                             const STORAGE_KEY = "selected_photos_" + FOLDER_ID;
                             const NOTES_STORAGE_KEY = "photo_notes_" + FOLDER_ID;
                             const STUDIO_ZALO_PHONE = "0388520391";
-                            const STUDIO_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxd8IxMapCIxdAGCZdz2Lsr9aIJYMcdmFI7Tl1eXJbMpmr-qHd8Tn3es2Gj-5zXxInr/exec";
+                            const STUDIO_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziBHUHWExJRpDh4Y_SSPNtMjl9NPaM80nql9nRwakg3TViR4dXy4EeCD9GS_9nkV1m/exec";
 
                             let selectedItems = new Set();
                             let photoNotes = {};

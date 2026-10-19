@@ -1,0 +1,7 @@
+# Ignore large files & duplicates
+ROOT_Project/tuan_orig.jpg
+ROOT_Project/ROOT.war
+*.tmp
+*.log
+edge_hist_tmp*.db
+Go_Cai_Dat_Adobe.bat

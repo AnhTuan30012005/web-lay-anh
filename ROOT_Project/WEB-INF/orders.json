@@ -1,0 +1,47 @@
+[
+  {
+    "rowIndex": 1,
+    "orderId": "ORD-220503",
+    "folderId": "1jlwAxIbGtIiVzILR0EjaL-yHfLmByvHr",
+    "clientName": "Nguyễn Hoàng Huyền",
+    "clientPhone": "0969463260",
+    "generalNote": "",
+    "selectedCount": 5,
+    "orString": "IMG_2501 OR IMG_2399 OR IMG_2265 OR IMG_2123 OR IMG_2450",
+    "notes": {},
+    "status": "Mới nhận",
+    "time": "22:36:53 13/10/2026",
+    "submittedAt": "2026-10-13T15:36:53.116Z"
+  },
+  {
+    "rowIndex": 2,
+    "orderId": "ORD-13o6-488",
+    "folderId": "13o6dvJECAFkhht2sGhShIKYPRVx26Atg",
+    "clientName": "Nguyễn Hoàng hà",
+    "clientPhone": "022555210236",
+    "generalNote": "",
+    "selectedCount": 3,
+    "orString": "4D7A0230 OR 4D7A0184 OR 4D7A0227",
+    "notes": {},
+    "status": "Mới nhận",
+    "time": "22:44:34 2/10/2026",
+    "submittedAt": "2026-10-02T15:44:34.000Z"
+  },
+  {
+    "rowIndex": 3,
+    "orderId": "ORD-13o6-512",
+    "folderId": "13o6dvJECAFkhht2sGhShIKYPRVx26Atg",
+    "clientName": "Lan Anh",
+    "clientPhone": "0388428466",
+    "generalNote": "chỉnh eo thon, da trắng, người phía sau xóa... đẹp",
+    "selectedCount": 4,
+    "orString": "4D7A0184 OR 4D7A0227 OR 4D7A0230 OR 4D7A0220",
+    "notes": {
+      "4D7A0184.jpg": "chỉnh eo thon, da trắng",
+      "4D7A0227.jpg": "người phía sau xóa đẹp"
+    },
+    "status": "Mới nhận",
+    "time": "22:41:19 2/10/2026",
+    "submittedAt": "2026-10-02T15:41:19.000Z"
+  }
+]

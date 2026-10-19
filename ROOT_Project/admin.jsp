@@ -1079,7 +1079,7 @@
     <!-- ==================================================== -->
     <script>
         // --- CẤU HÌNH MẶC ĐỊNH ---
-        const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxd8IxMapCIxdAGCZdz2Lsr9aIJYMcdmFI7Tl1eXJbMpmr-qHd8Tn3es2Gj-5zXxInr/exec";
+        const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziBHUHWExJRpDh4Y_SSPNtMjl9NPaM80nql9nRwakg3TViR4dXy4EeCD9GS_9nkV1m/exec";
         const BACKUP_ALBUMS_URL = "https://script.google.com/macros/s/AKfycbxd8IxMapCIxdAGCZdz2Lsr9aIJYMcdmFI7Tl1eXJbMpmr-qHd8Tn3es2Gj-5zXxInr/exec";
         const DEFAULT_PIN = "0388520391";
         const DEFAULT_PHONE = "0388520391";
@@ -1226,7 +1226,7 @@
         async function loadAllData() {
             setSyncStatus("syncing");
 
-            const fetchWithTimeout = (url, timeoutMs = 8000) => {
+            const fetchWithTimeout = (url, timeoutMs = 12000) => {
                 const controller = new AbortController();
                 const timer = setTimeout(() => controller.abort(), timeoutMs);
                 return fetch(url, { signal: controller.signal })
@@ -1238,12 +1238,14 @@
                 let ordersLoaded = false;
                 // 1. Ưu tiên tải từ Máy Chủ Trung Tâm (Central Java Server - Hoạt động trên mọi thiết bị, InPrivate & Facebook)
                 try {
-                    const serverRes = await fetchWithTimeout("tcController?action=getOrders", 5000);
+                    const serverRes = await fetchWithTimeout("tcController?action=getOrders", 6000);
                     if (serverRes.ok) {
                         const serverOrders = await serverRes.json();
                         if (Array.isArray(serverOrders) && serverOrders.length > 0) {
                             allOrders = serverOrders;
                             ordersLoaded = true;
+                            renderOrders();
+                            updateDashboardCounters();
                             try { localStorage.setItem("cached_orders_list", JSON.stringify(serverOrders)); } catch (e) {}
                         }
                     }
@@ -1254,7 +1256,7 @@
                 // 2. Thử tải thêm từ Google Apps Script (nếu có cấu hình) để hợp nhất dữ liệu
                 if (SCRIPT_URL) {
                     try {
-                        const sheetRes = await fetchWithTimeout(SCRIPT_URL + "?action=get_orders", 5000);
+                        const sheetRes = await fetchWithTimeout(SCRIPT_URL + "?action=get_orders", 12000);
                         if (sheetRes.ok) {
                             const sheetOrders = await sheetRes.json();
                             if (Array.isArray(sheetOrders) && sheetOrders.length > 0) {
@@ -1287,12 +1289,14 @@
                 let albumsLoaded = false;
                 // 1. Tải từ Máy Chủ Java Trung Tâm (Central Server)
                 try {
-                    const srvAlbRes = await fetchWithTimeout("tcController?action=getAlbums", 5000);
+                    const srvAlbRes = await fetchWithTimeout("tcController?action=getAlbums", 6000);
                     if (srvAlbRes.ok) {
                         const srvAlbums = await srvAlbRes.json();
                         if (Array.isArray(srvAlbums) && srvAlbums.length > 0) {
                             allAlbums = srvAlbums;
                             albumsLoaded = true;
+                            renderAlbums();
+                            updateDashboardCounters();
                             try { localStorage.setItem("cached_albums_list", JSON.stringify(srvAlbums)); } catch (e) {}
                         }
                     }
@@ -1302,8 +1306,8 @@
 
                 // 2. Tải thêm từ Google Apps Script (nếu có) để hợp nhất dữ liệu
                 try {
-                    const scriptRes = await fetchWithTimeout(SCRIPT_URL + "?action=getAdminData", 5000)
-                        .catch(() => fetchWithTimeout(BACKUP_ALBUMS_URL + "?action=getAdminData", 5000));
+                    const scriptRes = await fetchWithTimeout(SCRIPT_URL + "?action=getAdminData", 12000)
+                        .catch(() => fetchWithTimeout(BACKUP_ALBUMS_URL + "?action=getAdminData", 12000));
                     if (scriptRes && scriptRes.ok) {
                         const data = await scriptRes.json();
                         if (Array.isArray(data) && data.length > 0) {
