@@ -720,6 +720,9 @@
                                 <option value="Đang sửa">Đang sửa</option>
                                 <option value="Hoàn thành">Hoàn thành</option>
                             </select>
+                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 d-inline-flex align-items-center" onclick="clearAllOrdersConfirm()" title="Xóa sạch dữ liệu khách chọn">
+                                <i class="bi bi-trash3-fill me-1"></i> Xóa sạch đơn
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1241,7 +1244,7 @@
                     const serverRes = await fetchWithTimeout("tcController?action=getOrders", 6000);
                     if (serverRes.ok) {
                         const serverOrders = await serverRes.json();
-                        if (Array.isArray(serverOrders) && serverOrders.length > 0) {
+                        if (Array.isArray(serverOrders)) {
                             allOrders = serverOrders;
                             ordersLoaded = true;
                             renderOrders();
@@ -1722,6 +1725,34 @@
             if (currentDetailOrder && currentDetailOrder.orString) {
                 copyOrCode(currentDetailOrder.orString);
             }
+        }
+
+                async function clearAllOrdersConfirm() {
+            if (!confirm("⚠️ BẠN CÓ CHẮC CHẮN MUỐN XÓA TOÀN BỘ ĐƠN HÀNG?\n\nToàn bộ dữ liệu khách chọn sẽ bị xóa sạch khỏi máy chủ và bộ nhớ đệm trình duyệt.\nKho 30 Album ảnh của Studio vẫn sẽ được giữ nguyên 100%.")) {
+                return;
+            }
+            showToast("Đang xóa toàn bộ đơn...");
+            try {
+                await fetch("tcController?action=clearAllOrders", { method: "POST" });
+            } catch (e) {
+                console.warn("Lỗi gọi server clearAllOrders:", e);
+            }
+            
+            // Xóa sạch bộ nhớ cache đơn hàng trên trình duyệt
+            try {
+                localStorage.removeItem("cached_orders_list");
+                for (let i = localStorage.length - 1; i >= 0; i--) {
+                    const k = localStorage.key(i);
+                    if (k && (k.startsWith("order_sub_") || k.startsWith("latest_submitted_order_"))) {
+                        localStorage.removeItem(k);
+                    }
+                }
+            } catch (e) {}
+            
+            allOrders = [];
+            renderOrders();
+            updateDashboardCounters();
+            showToast("✅ Đã xóa sạch toàn bộ đơn hàng!");
         }
 
         function deleteOrder(index) {

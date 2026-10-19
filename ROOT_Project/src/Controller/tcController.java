@@ -183,48 +183,7 @@ public class tcController extends HttpServlet {
                 }
             } catch (Exception ignored) {}
         }
-        if (ORDER_STORE.isEmpty()) {
-            ORDER_STORE.add(new OrderRecord(
-                "ORD-220503",
-                "1jlwAxIbGtIiVzILR0EjaL-yHfLmByvHr",
-                "Nguyễn Hoàng Huyền",
-                "0969463260",
-                "",
-                5,
-                "IMG_2501 OR IMG_2399 OR IMG_2265 OR IMG_2123 OR IMG_2450",
-                "{}",
-                "Mới nhận",
-                "22:36:53 13/10/2026",
-                "2026-10-13T15:36:53.116Z"
-            ));
-            ORDER_STORE.add(new OrderRecord(
-                "ORD-13o6-488",
-                "13o6dvJECAFkhht2sGhShIKYPRVx26Atg",
-                "Nguyễn Hoàng hà",
-                "022555210236",
-                "",
-                3,
-                "4D7A0230 OR 4D7A0184 OR 4D7A0227",
-                "{}",
-                "Mới nhận",
-                "22:44:34 2/10/2026",
-                "2026-10-02T15:44:34.000Z"
-            ));
-            ORDER_STORE.add(new OrderRecord(
-                "ORD-13o6-512",
-                "13o6dvJECAFkhht2sGhShIKYPRVx26Atg",
-                "Lan Anh",
-                "0388428466",
-                "chỉnh eo thon, da trắng, người phía sau xóa... đẹp",
-                4,
-                "4D7A0184 OR 4D7A0227 OR 4D7A0230 OR 4D7A0220",
-                "{\"4D7A0184.jpg\":\"chỉnh eo thon, da trắng\",\"4D7A0227.jpg\":\"người phía sau xóa đẹp\"}",
-                "Mới nhận",
-                "22:41:19 2/10/2026",
-                "2026-10-02T15:41:19.000Z"
-            ));
-        }
-        if (file != null && !ORDER_STORE.isEmpty()) {
+        if (file != null) {
             saveOrdersToFile(file);
         }
         ordersInitialized = true;
@@ -667,6 +626,17 @@ public class tcController extends HttpServlet {
             response.setContentType("application/json; charset=UTF-8");
             response.setHeader("Access-Control-Allow-Origin", "*");
             response.getWriter().write("{\"status\":\"success\"}");
+            return;
+        }
+
+        if ("clearAllOrders".equals(action)) {
+            ensureOrdersLoaded(request);
+            ORDER_STORE.clear();
+            File file = getOrdersFile(request);
+            if (file != null) saveOrdersToFile(file);
+            response.setContentType("application/json; charset=UTF-8");
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.getWriter().write("{\"status\":\"success\",\"message\":\"Đã xóa toàn bộ đơn hàng!\"}");
             return;
         }
 

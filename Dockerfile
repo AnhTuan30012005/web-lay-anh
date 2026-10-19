@@ -1,7 +1,7 @@
 # Sử dụng Tomcat 9 với Java 17 Temurin (đã fix lỗi cgroup v2 của bản openjdk-slim cũ)
 FROM tomcat:9.0-jdk17-temurin
 
-# Build version: 2026-10-19-Sync-30-Albums-And-Orders-v4
+# Build version: 2026-10-19-Sync-Clear-Orders-Keep-Albums-v5
 RUN rm -rf /usr/local/tomcat/webapps/*
 
 # Giải nén trực tiếp ROOT.war vào /usr/local/tomcat/webapps/ROOT khi build Docker
