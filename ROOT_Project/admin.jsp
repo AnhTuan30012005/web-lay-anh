@@ -816,7 +816,7 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label text-secondary small mb-1">Link rút gọn (TinyURL):</label>
+                                    <label class="form-label text-secondary small mb-1">Link rút gọn (is.gd):</label>
                                     <div class="input-group">
                                         <input type="text" id="resShortUrl" class="form-control glass-input" readonly>
                                         <button class="btn btn-outline-info" onclick="copyResultLink('resShortUrl')"><i class="bi bi-clipboard"></i> Copy</button>
@@ -958,6 +958,9 @@
                 <a id="btnDetailOpenWeb" href="#" target="_blank" class="btn-glass-sm flex-grow-1 justify-content-center py-2">
                     <i class="bi bi-images me-1"></i> Xem Ảnh Trên Web
                 </a>
+                <button class="btn-glass-sm py-2 px-3 text-info" id="btnDetailCopyShortLink" onclick="copyCurrentOrderDetailLink(this)" title="Copy Link Rút Gọn (is.gd)">
+                    <i class="bi bi-link-45deg me-1"></i> Copy Link Rút Gọn
+                </button>
                 <button class="btn-apple py-2 px-3" onclick="copyDetailOrCode()">
                     <i class="bi bi-clipboard-check me-1"></i> Copy Mã OR
                 </button>
@@ -1988,19 +1991,26 @@
             // Xây dựng link trực tiếp sạch gọn
             let host = window.location.origin;
             if (host.includes("localhost") || host.includes("127.0.0.1")) {
-                host = "https://web-lay-anh.onrender.com";
+                host = "https://web-lay-anh-2jjf.onrender.com";
             }
             const cleanUrl = host + "/?id=" + encodeURIComponent(folderId);
 
             // Rút gọn link (ưu tiên is.gd)
             let shortUrl = cleanUrl;
             try {
-                const apiRes = await fetch("/tcController?action=shorten&longUrl=" + encodeURIComponent(cleanUrl));
+                const apiRes = await fetch("tcController?action=shorten&longUrl=" + encodeURIComponent(cleanUrl));
                 if (apiRes.ok) {
                     const text = (await apiRes.text()).trim();
-                    if (text.startsWith("http") && !text.toLowerCase().includes("error")) shortUrl = text;
+                    if (text.startsWith("http") && !text.toLowerCase().includes("error") && text !== cleanUrl) shortUrl = text;
                 }
             } catch (e) {}
+
+            if (shortUrl === cleanUrl) {
+                const clientShort = await shortenUrlClientSide(cleanUrl);
+                if (clientShort && clientShort !== cleanUrl) shortUrl = clientShort;
+            }
+            albumShortLinkCache[cleanUrl] = shortUrl;
+            albumShortLinkCache[folderId] = shortUrl;
 
             // Tự động quét số lượng ảnh & ảnh đại diện
             let autoThumb = "";
@@ -2072,13 +2082,81 @@
             document.getElementById("createResultBox").scrollIntoView({ behavior: "smooth" });
         }
 
+        const albumShortLinkCache = {};
+
+        async function copyTextToClipboard(text) {
+            if (!text) return false;
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                }
+            } catch (e) {}
+            try {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-9999px";
+                textArea.style.top = "0";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                const ok = document.execCommand('copy');
+                document.body.removeChild(textArea);
+                if (ok) return true;
+            } catch (e) {}
+            return false;
+        }
+
+        async function shortenUrlClientSide(longUrl) {
+            if (!longUrl) return "";
+            try {
+                // Thử is.gd trực tiếp từ trình duyệt (có CORS)
+                const res = await fetch("https://is.gd/create.php?format=json&url=" + encodeURIComponent(longUrl));
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.shorturl) return data.shorturl;
+                }
+            } catch (e) {}
+            try {
+                // Thử da.gd trực tiếp từ trình duyệt
+                const res = await fetch("https://da.gd/s?url=" + encodeURIComponent(longUrl));
+                if (res.ok) {
+                    const short = (await res.text()).trim();
+                    if (short.startsWith("http")) return short;
+                }
+            } catch (e) {}
+            return longUrl;
+        }
+
+        async function getShortLinkForUrl(longUrl) {
+            if (!longUrl) return "";
+            if (albumShortLinkCache[longUrl]) return albumShortLinkCache[longUrl];
+            try {
+                const res = await fetch("tcController?action=shorten&longUrl=" + encodeURIComponent(longUrl));
+                if (res.ok) {
+                    const text = (await res.text()).trim();
+                    if (text.startsWith("http") && !text.toLowerCase().includes("error") && text !== longUrl) {
+                        albumShortLinkCache[longUrl] = text;
+                        return text;
+                    }
+                }
+            } catch (e) {}
+            const clientShort = await shortenUrlClientSide(longUrl);
+            if (clientShort && clientShort !== longUrl) {
+                albumShortLinkCache[longUrl] = clientShort;
+                return clientShort;
+            }
+            return longUrl;
+        }
+
         async function copyResultLink(inputId) {
             const input = document.getElementById(inputId);
             if (input && input.value) {
-                try {
-                    await navigator.clipboard.writeText(input.value);
+                const ok = await copyTextToClipboard(input.value);
+                if (ok) {
                     showToast("✅ Đã sao chép liên kết!");
-                } catch (e) {
+                } else {
                     prompt("Sao chép link:", input.value);
                 }
             }
@@ -2087,14 +2165,118 @@
         async function copyZaloTemplate() {
             const msg = document.getElementById("resZaloMessage").value;
             const phone = document.getElementById("newAlbumClientPhone").value.trim();
-            try {
-                await navigator.clipboard.writeText(msg);
+            const ok = await copyTextToClipboard(msg);
+            if (ok) {
                 showToast("✅ Đã copy tin nhắn Zalo!");
-                if (phone) {
-                    window.open("https://zalo.me/" + phone, "_blank");
-                }
-            } catch (e) {
+            } else {
                 prompt("Sao chép tin nhắn:", msg);
+            }
+            if (phone) {
+                window.open("https://zalo.me/" + phone.replace(/\D/g, ''), "_blank");
+            }
+        }
+
+        async function copyAlbumShortLink(albumId, albumName, btn) {
+            if (!albumId) {
+                showToast("Không tìm thấy ID album!", "warning");
+                return;
+            }
+            const origHtml = btn ? btn.innerHTML : "";
+            if (btn) {
+                btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span>`;
+                btn.disabled = true;
+            }
+
+            let host = window.location.origin;
+            if (host.includes("localhost") || host.includes("127.0.0.1")) {
+                host = "https://web-lay-anh-2jjf.onrender.com";
+            }
+            const cleanUrl = host + "/?id=" + encodeURIComponent(albumId);
+            const shortUrl = await getShortLinkForUrl(cleanUrl);
+
+            await copyTextToClipboard(shortUrl);
+            if (shortUrl !== cleanUrl) {
+                showToast("✅ Đã copy Link Rút Gọn (is.gd): " + shortUrl);
+            } else {
+                showToast("✅ Đã copy link album: " + cleanUrl);
+            }
+
+            if (btn) {
+                btn.innerHTML = origHtml;
+                btn.disabled = false;
+            }
+        }
+
+        async function copyAlbumZaloMessage(albumId, albumName, clientPhone, btn) {
+            if (!albumId) {
+                showToast("Không tìm thấy ID album!", "warning");
+                return;
+            }
+            const origHtml = btn ? btn.innerHTML : "";
+            if (btn) {
+                btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span>`;
+                btn.disabled = true;
+            }
+
+            let host = window.location.origin;
+            if (host.includes("localhost") || host.includes("127.0.0.1")) {
+                host = "https://web-lay-anh-2jjf.onrender.com";
+            }
+            const cleanUrl = host + "/?id=" + encodeURIComponent(albumId);
+            const shortUrl = await getShortLinkForUrl(cleanUrl);
+
+            const zaloMsg = `Chào bạn ${albumName || 'nhé'}! Studio Tuấn Hoa gửi bạn link xem và chọn ảnh nè:
+📸 Link xem và chọn ảnh: ${shortUrl}
+
+💡 Hướng dẫn chọn ảnh siêu tiện:
+1. Bạn bấm vào ảnh để xem to nét căng và zoom chi tiết.
+2. Bấm chọn những ảnh bạn ưng ý nhất.
+3. Nếu tấm nào cần ghi chú (VD: bóp eo, xóa người, làm sáng), bạn gõ ngay vào ô ghi chú dưới ảnh nhé.
+4. Chọn xong bấm "Chốt danh sách" gửi lại cho Studio là xong nha!`;
+
+            await copyTextToClipboard(zaloMsg);
+            showToast("✅ Đã copy tin nhắn Zalo gửi khách!");
+
+            if (clientPhone && clientPhone.trim()) {
+                window.open("https://zalo.me/" + clientPhone.trim().replace(/\D/g, ''), "_blank");
+            }
+
+            if (btn) {
+                btn.innerHTML = origHtml;
+                btn.disabled = false;
+            }
+        }
+
+        async function copyCurrentOrderDetailLink(btn) {
+            if (!currentDetailOrder || !currentDetailOrder.folderId) {
+                showToast("Không tìm thấy thông tin đơn hàng!", "warning");
+                return;
+            }
+            const origHtml = btn ? btn.innerHTML : "";
+            if (btn) {
+                btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Đang tạo link...`;
+                btn.disabled = true;
+            }
+
+            let host = window.location.origin;
+            if (host.includes("localhost") || host.includes("127.0.0.1")) {
+                host = "https://web-lay-anh-2jjf.onrender.com";
+            }
+            const picks = getPhotoNamesFromOr(currentDetailOrder.orString);
+            let longUrl = host + "/?id=" + encodeURIComponent(currentDetailOrder.folderId);
+            if (picks) longUrl += "&picks=" + encodeURIComponent(picks);
+
+            const shortUrl = await getShortLinkForUrl(longUrl);
+            await copyTextToClipboard(shortUrl);
+            if (shortUrl !== longUrl) {
+                showToast("✅ Đã copy Link Rút Gọn (is.gd) ảnh khách chọn!");
+            } else {
+                showToast("✅ Đã copy link ảnh khách chọn!");
+            }
+
+            if (btn) {
+                btn.innerHTML = origHtml;
+                btn.disabled = false;
             }
         }
 
@@ -2133,7 +2315,7 @@
                     col.className = "col-12 col-sm-6 col-lg-4 col-xl-3";
 
                     let host = window.location.origin;
-                    if (host.includes("localhost") || host.includes("127.0.0.1")) host = "https://web-lay-anh.onrender.com";
+                    if (host.includes("localhost") || host.includes("127.0.0.1")) host = "https://web-lay-anh-2jjf.onrender.com";
                     const albumId = String(album.id || "");
                     const albumName = String(album.name !== undefined && album.name !== null ? album.name : "Album mới");
                     const cleanUrl = host + "/?id=" + encodeURIComponent(albumId);
@@ -2202,8 +2384,11 @@
                                 <a href="${cleanUrl}" target="_blank" class="btn-glass-sm flex-grow-1 justify-content-center text-decoration-none" title="Xem thử album gốc">
                                     <i class="bi bi-eye"></i> Mở album
                                 </a>
-                                <button class="btn-glass-sm" onclick="copyOrCode('${cleanUrl}')" title="Copy Link Album">
-                                    <i class="bi bi-link-45deg"></i>
+                                <button class="btn-glass-sm text-info" onclick="copyAlbumShortLink('${albumId}', '${escapeAttr(albumName)}', this)" title="Copy Link Rút Gọn (is.gd)">
+                                    <i class="bi bi-link-45deg"></i> Copy Link
+                                </button>
+                                <button class="btn-glass-sm text-success" onclick="copyAlbumZaloMessage('${albumId}', '${escapeAttr(albumName)}', '${escapeAttr(album.clientPhone || '')}', this)" title="Copy Tin Nhắn Zalo Gửi Khách">
+                                    <i class="bi bi-chat-dots-fill"></i> Zalo
                                 </button>
                                 <button class="btn-glass-sm text-warning" onclick="openEditAlbumModal(${albumIndex})" title="Sửa album">
                                     <i class="bi bi-pencil"></i>

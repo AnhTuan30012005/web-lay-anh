@@ -2109,8 +2109,53 @@
                             }
 
                             // ====================================================
-                            // RÚT GỌN LINK & COPY
+                            // RÚT GỌN LINK & COPY (ƯU TIÊN is.gd)
                             // ====================================================
+                            async function copyTextToClipboard(text) {
+                                if (!text) return false;
+                                try {
+                                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                                        await navigator.clipboard.writeText(text);
+                                        return true;
+                                    }
+                                } catch (e) {}
+                                try {
+                                    const textArea = document.createElement("textarea");
+                                    textArea.value = text;
+                                    textArea.style.position = "fixed";
+                                    textArea.style.left = "-9999px";
+                                    textArea.style.top = "0";
+                                    document.body.appendChild(textArea);
+                                    textArea.focus();
+                                    textArea.select();
+                                    const ok = document.execCommand('copy');
+                                    document.body.removeChild(textArea);
+                                    if (ok) return true;
+                                } catch (e) {}
+                                return false;
+                            }
+
+                            async function shortenUrlClientSide(longUrl) {
+                                if (!longUrl) return "";
+                                try {
+                                    // Thử is.gd trực tiếp từ trình duyệt
+                                    const res = await fetch("https://is.gd/create.php?format=json&url=" + encodeURIComponent(longUrl));
+                                    if (res.ok) {
+                                        const data = await res.json();
+                                        if (data && data.shorturl) return data.shorturl;
+                                    }
+                                } catch (e) {}
+                                try {
+                                    // Thử da.gd trực tiếp từ trình duyệt
+                                    const res = await fetch("https://da.gd/s?url=" + encodeURIComponent(longUrl));
+                                    if (res.ok) {
+                                        const short = (await res.text()).trim();
+                                        if (short.startsWith("http")) return short;
+                                    }
+                                } catch (e) {}
+                                return longUrl;
+                            }
+
                             async function shortenAndCopyLink() {
                                 const btn = document.getElementById('btnShare');
                                 const originalText = btn.innerHTML;
@@ -2120,7 +2165,7 @@
                                 // 1. Xác định Domain chuẩn (tránh localhost khi test)
                                 let host = window.location.origin;
                                 if (host.includes("localhost") || host.includes("127.0.0.1") || host.includes("192.168.")) {
-                                    host = "https://web-lay-anh.onrender.com";
+                                    host = "https://web-lay-anh-2jjf.onrender.com";
                                 }
 
                                 // 2. Lấy Folder ID hiện tại
@@ -2130,7 +2175,7 @@
                                     folderId = urlParams.get('id') || urlParams.get('txtLink') || '';
                                 }
 
-                                // 3. Xây dựng link sạch gọn gàng https://web-lay-anh.onrender.com/?id=...
+                                // 3. Xây dựng link sạch gọn gàng https://web-lay-anh-2jjf.onrender.com/?id=...
                                 let cleanUrl = host + '/?id=' + encodeURIComponent(folderId);
                                 if (selectedItems.size > 0) {
                                     let names = [];
@@ -2143,16 +2188,27 @@
                                     let response = await fetch(apiUrl);
                                     if (response.ok) {
                                         let shortLink = (await response.text()).trim();
-                                        if (shortLink && (shortLink.startsWith("http://") || shortLink.startsWith("https://")) && !shortLink.toLowerCase().includes("error")) {
-                                            await navigator.clipboard.writeText(shortLink);
-                                            alert("✅ Đã copy Link Rút Gọn:\n" + shortLink + "\n\n(Khách bấm vào link sẽ mở thẳng album ảnh ngay lập tức!)");
+                                        if (shortLink && (shortLink.startsWith("http://") || shortLink.startsWith("https://")) 
+                                            && !shortLink.toLowerCase().includes("error") 
+                                            && shortLink !== cleanUrl) {
+                                            await copyTextToClipboard(shortLink);
+                                            alert("✅ Đã copy Link Rút Gọn (is.gd):\n" + shortLink + "\n\n(Khách bấm vào link sẽ mở thẳng album ảnh ngay lập tức!)");
                                             return;
                                         }
                                     }
+
+                                    // Dự phòng trực tiếp từ client nếu server chưa kịp trả về link rút gọn
+                                    const clientShort = await shortenUrlClientSide(cleanUrl);
+                                    if (clientShort && clientShort !== cleanUrl) {
+                                        await copyTextToClipboard(clientShort);
+                                        alert("✅ Đã copy Link Rút Gọn (is.gd):\n" + clientShort + "\n\n(Khách bấm vào link sẽ mở thẳng album ảnh ngay lập tức!)");
+                                        return;
+                                    }
+
                                     throw new Error("Lỗi dịch vụ rút gọn");
                                 } catch (err) {
                                     console.warn(err);
-                                    await navigator.clipboard.writeText(cleanUrl);
+                                    await copyTextToClipboard(cleanUrl);
                                     alert("✅ Đã copy Link Album Gọn Gàng:\n" + cleanUrl + "\n\n(Khách bấm vào link sẽ mở thẳng album ảnh ngay lập tức!)");
                                 } finally {
                                     btn.innerHTML = originalText;
@@ -2295,6 +2351,17 @@
                                 let msg = isUpdate ? "🔔 BẢN CẬP NHẬT CHỐT ẢNH MỚI NHẤT (Khách đã chỉnh sửa):\n" : "Chào Studio, mình gửi danh sách chọn ảnh:\n";
                                 msg += "👤 Khách hàng: " + clientName + (clientPhone ? " - SĐT: " + clientPhone : "") + "\n";
                                 msg += "📁 Tổng số ảnh chọn: " + selectedItems.size + " ảnh\n";
+                                let host = window.location.origin;
+                                if (host.includes("localhost") || host.includes("127.0.0.1") || host.includes("192.168.")) {
+                                    host = "https://web-lay-anh-2jjf.onrender.com";
+                                }
+                                let shareUrl = host + "/?id=" + encodeURIComponent(FOLDER_ID);
+                                if (selectedItems.size > 0) {
+                                    let names = [];
+                                    selectedItems.forEach(card => { names.push(card.getAttribute('data-name')); });
+                                    shareUrl += "&picks=" + encodeURIComponent(names.join(','));
+                                }
+                                msg += "🔗 Link xem lại ảnh đã chọn: " + shareUrl + "\n";
                                 if (generalNote) {
                                     msg += "📝 Dặn dò chung: " + generalNote + "\n";
                                 }

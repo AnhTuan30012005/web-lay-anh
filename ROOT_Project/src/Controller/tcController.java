@@ -771,13 +771,14 @@ public class tcController extends HttpServlet {
             return;
         }
 
-        // 1. Rút gọn link chia sẻ (Ưu tiên TinyURL 301 direct, dự phòng is.gd)
+        // 1. Rút gọn link chia sẻ (Ưu tiên is.gd, dự phòng da.gd, TinyURL, clck.ru)
         if ("shorten".equals(action)) {
             String longUrl = request.getParameter("longUrl");
             String shortUrl = this.getShortUrl(longUrl);
-            response.setContentType("text/plain");
+            response.setContentType("text/plain; charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(shortUrl);
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.getWriter().write(shortUrl != null ? shortUrl : "");
             return;
         }
 
@@ -1222,32 +1223,51 @@ public class tcController extends HttpServlet {
     }
 
     /**
-     * Tạo link rút gọn: Ưu tiên is.gd (chuyển hướng 301 trực tiếp không qua trang trung gian),
-     * dự phòng TinyURL, nếu lỗi trả về chính link gốc.
+    /**
+     * Tạo link rút gọn: Ưu tiên is.gd (theo yêu cầu người dùng, chuyển hướng 301 trực tiếp),
+     * dự phòng da.gd, TinyURL, clck.ru nếu is.gd gặp lỗi hoặc timeout.
      */
     private String getShortUrl(String longUrl) {
         if (longUrl == null || longUrl.trim().isEmpty()) return "";
         try {
             if (longUrl.contains("localhost") || longUrl.contains("192.168.") || longUrl.contains("127.0.0.1")) {
-                longUrl = longUrl.replaceAll("https?://[^/]+", "https://web-lay-anh.onrender.com");
+                longUrl = longUrl.replaceAll("https?://[^/]+", "https://web-lay-anh-2jjf.onrender.com");
             }
             String encodedUrl = URLEncoder.encode(longUrl, StandardCharsets.UTF_8.name());
 
-            // 1. is.gd: Chuyển hướng 301 trực tiếp, không trang trung gian
+            // 1. Ưu tiên hàng đầu: is.gd (301 direct redirect, không quảng cáo)
             try {
                 String isGdApi = "https://is.gd/create.php?format=simple&url=" + encodedUrl;
-                String isGdUrl = fetchUrlContent(isGdApi);
+                String isGdUrl = fetchUrlContent(isGdApi, 3500);
                 if (isGdUrl != null && !isGdUrl.toLowerCase().contains("error") && isGdUrl.startsWith("http")) {
                     return isGdUrl;
                 }
             } catch (Exception ignored) {}
 
-            // 2. Dự phòng TinyURL
+            // 2. Dự phòng 1: da.gd (Phản hồi siêu nhanh ~0.3s, 301 direct redirect, link siêu gọn)
+            try {
+                String daGdApi = "https://da.gd/s?url=" + encodedUrl;
+                String daGdUrl = fetchUrlContent(daGdApi, 3500);
+                if (daGdUrl != null && !daGdUrl.toLowerCase().contains("error") && daGdUrl.startsWith("http")) {
+                    return daGdUrl;
+                }
+            } catch (Exception ignored) {}
+
+            // 3. Dự phòng 2: TinyURL
             try {
                 String tinyUrlApi = "https://tinyurl.com/api-create.php?url=" + encodedUrl;
-                String shortUrl = fetchUrlContent(tinyUrlApi);
+                String shortUrl = fetchUrlContent(tinyUrlApi, 6000);
                 if (shortUrl != null && !shortUrl.toLowerCase().contains("error") && shortUrl.startsWith("http")) {
                     return shortUrl;
+                }
+            } catch (Exception ignored) {}
+
+            // 4. Dự phòng 3: clck.ru (301 direct redirect, cực kỳ ổn định)
+            try {
+                String clckApi = "https://clck.ru/--?url=" + encodedUrl;
+                String clckUrl = fetchUrlContent(clckApi, 3500);
+                if (clckUrl != null && !clckUrl.toLowerCase().contains("error") && clckUrl.startsWith("http")) {
+                    return clckUrl;
                 }
             } catch (Exception ignored) {}
 
@@ -1257,23 +1277,28 @@ public class tcController extends HttpServlet {
         }
     }
 
-    private String fetchUrlContent(String apiUrl) {
+    private String fetchUrlContent(String apiUrl, int timeoutMs) {
         HttpURLConnection conn = null;
         try {
             URL url = new URL(apiUrl);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            conn.setConnectTimeout(4000);
-            conn.setReadTimeout(4000);
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
-            if (conn.getResponseCode() == 200) {
+            conn.setConnectTimeout(timeoutMs > 0 ? timeoutMs : 4000);
+            conn.setReadTimeout(timeoutMs > 0 ? timeoutMs : 4000);
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
+            conn.setRequestProperty("Accept", "*/*");
+            int code = conn.getResponseCode();
+            if (code == 200) {
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
                     StringBuilder sb = new StringBuilder();
                     String line;
                     while ((line = in.readLine()) != null) {
                         sb.append(line.trim());
                     }
-                    return sb.toString();
+                    String res = sb.toString().trim();
+                    if (!res.isEmpty()) {
+                        return res;
+                    }
                 }
             }
         } catch (Exception ignored) {
