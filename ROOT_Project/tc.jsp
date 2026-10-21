@@ -1107,7 +1107,56 @@
                                                     </a>
                                                 </div>
                                             </div>
-                                        <% } %>
+                                        <% } else { 
+                                            List<String> studioAlbums = (List<String>) request.getAttribute("studioAlbums");
+                                            if (studioAlbums != null && !studioAlbums.isEmpty()) {
+                                        %>
+                                            <!-- Khi chưa dán ID: Hiển thị trọn vẹn Kho Album Mẫu của Studio Tuấn Hoa -->
+                                            <div class="mt-4 mb-5">
+                                                <div class="d-flex align-items-center justify-content-between mb-3 px-1">
+                                                    <h5 class="text-white fw-bold m-0 d-flex align-items-center">
+                                                        <i class="bi bi-collection-play-fill text-warning me-2 fs-5"></i>
+                                                        Kho Album Ảnh Studio Tuấn Hoa
+                                                    </h5>
+                                                    <span class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-30 rounded-pill px-3 py-1">
+                                                        <%= studioAlbums.size() %> Album
+                                                    </span>
+                                                </div>
+                                                <div class="row g-3">
+                                                    <%
+                                                        for (String albStr : studioAlbums) {
+                                                            String albId = Controller.tcController.extractJsonField(albStr, "id");
+                                                            String albName = Controller.tcController.extractJsonField(albStr, "name");
+                                                            String albThumb = Controller.tcController.extractJsonField(albStr, "thumb");
+                                                            int albQty = Controller.tcController.extractJsonInt(albStr, "qty", 0);
+                                                            if (albName == null || albName.isEmpty()) albName = "Album Mới";
+                                                            if (albThumb == null || albThumb.isEmpty()) albThumb = "tuan.jpg";
+                                                    %>
+                                                    <div class="col-6 col-md-4 col-lg-3">
+                                                        <a href="tcController?txtLink=<%= URLEncoder.encode(albId, "UTF-8") %>&action=view" class="text-decoration-none">
+                                                            <div class="glass-panel p-2 h-100 hover-card" style="border-radius: 16px; transition: all 0.25s ease; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.05);">
+                                                                <div style="position: relative; width: 100%; aspect-ratio: 1/1; border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.4);">
+                                                                    <img src="<%= albThumb %>" alt="<%= escapeHtml(albName) %>" loading="lazy"
+                                                                        style="width: 100%; height: 100%; object-fit: cover;"
+                                                                        onerror="this.src='tuan.jpg'">
+                                                                    <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 end-0 m-2 rounded-pill px-2 py-1 shadow-sm" style="font-size: 11px;">
+                                                                        <i class="bi bi-images me-1 text-info"></i><%= albQty %> ảnh
+                                                                    </span>
+                                                                </div>
+                                                                <div class="mt-2 px-1">
+                                                                    <div class="text-white fw-semibold text-truncate" style="font-size: 0.92rem;"><%= escapeHtml(albName) %></div>
+                                                                    <div class="text-white-50 small mt-1 d-flex align-items-center justify-content-between" style="font-size: 12px;">
+                                                                        <span>Mở xem ảnh</span>
+                                                                        <i class="bi bi-arrow-right-circle-fill text-info"></i>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        <% } } %>
 
                         </div>
 
