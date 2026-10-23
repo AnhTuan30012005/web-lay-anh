@@ -5,3 +5,5 @@ ROOT_Project/ROOT.war
 *.log
 edge_hist_tmp*.db
 Go_Cai_Dat_Adobe.bat
+admin/
+lay_anh/

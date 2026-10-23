@@ -1107,56 +1107,40 @@
                                                     </a>
                                                 </div>
                                             </div>
-                                        <% } else { 
-                                            List<String> studioAlbums = (List<String>) request.getAttribute("studioAlbums");
-                                            if (studioAlbums != null && !studioAlbums.isEmpty()) {
-                                        %>
-                                            <!-- Khi chưa dán ID: Hiển thị trọn vẹn Kho Album Mẫu của Studio Tuấn Hoa -->
-                                            <div class="mt-4 mb-5">
-                                                <div class="d-flex align-items-center justify-content-between mb-3 px-1">
-                                                    <h5 class="text-white fw-bold m-0 d-flex align-items-center">
-                                                        <i class="bi bi-collection-play-fill text-warning me-2 fs-5"></i>
-                                                        Kho Album Ảnh Studio Tuấn Hoa
-                                                    </h5>
-                                                    <span class="badge bg-info bg-opacity-15 text-info border border-info border-opacity-30 rounded-pill px-3 py-1">
-                                                        <%= studioAlbums.size() %> Album
-                                                    </span>
-                                                </div>
-                                                <div class="row g-3">
-                                                    <%
-                                                        for (String albStr : studioAlbums) {
-                                                            String albId = Controller.tcController.extractJsonField(albStr, "id");
-                                                            String albName = Controller.tcController.extractJsonField(albStr, "name");
-                                                            String albThumb = Controller.tcController.extractJsonField(albStr, "thumb");
-                                                            int albQty = Controller.tcController.extractJsonInt(albStr, "qty", 0);
-                                                            if (albName == null || albName.isEmpty()) albName = "Album Mới";
-                                                            if (albThumb == null || albThumb.isEmpty()) albThumb = "tuan.jpg";
-                                                    %>
-                                                    <div class="col-6 col-md-4 col-lg-3">
-                                                        <a href="tcController?txtLink=<%= URLEncoder.encode(albId, "UTF-8") %>&action=view" class="text-decoration-none">
-                                                            <div class="glass-panel p-2 h-100 hover-card" style="border-radius: 16px; transition: all 0.25s ease; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.05);">
-                                                                <div style="position: relative; width: 100%; aspect-ratio: 1/1; border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.4);">
-                                                                    <img src="<%= albThumb %>" alt="<%= escapeHtml(albName) %>" loading="lazy"
-                                                                        style="width: 100%; height: 100%; object-fit: cover;"
-                                                                        onerror="this.src='tuan.jpg'">
-                                                                    <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 end-0 m-2 rounded-pill px-2 py-1 shadow-sm" style="font-size: 11px;">
-                                                                        <i class="bi bi-images me-1 text-info"></i><%= albQty %> ảnh
-                                                                    </span>
-                                                                </div>
-                                                                <div class="mt-2 px-1">
-                                                                    <div class="text-white fw-semibold text-truncate" style="font-size: 0.92rem;"><%= escapeHtml(albName) %></div>
-                                                                    <div class="text-white-50 small mt-1 d-flex align-items-center justify-content-between" style="font-size: 12px;">
-                                                                        <span>Mở xem ảnh</span>
-                                                                        <i class="bi bi-arrow-right-circle-fill text-info"></i>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </a>
+                                        <% } else { %>
+                                            <!-- Khi chưa mở album: Hướng dẫn sử dụng bảo mật & tinh gọn, không phô bày kho ảnh khách hàng -->
+                                            <div class="glass-panel text-center py-5 px-3 mt-4" style="border-radius: 20px;">
+                                                <div class="mb-3">
+                                                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 60px; height: 60px; background: rgba(14, 165, 233, 0.15); color: #38bdf8;">
+                                                        <i class="bi bi-cloud-check-fill" style="font-size: 28px;"></i>
                                                     </div>
-                                                    <% } %>
+                                                </div>
+                                                <h5 class="text-white fw-bold mb-2">Hệ thống Lọc & Tải Ảnh Studio Tuấn Hoa</h5>
+                                                <p class="text-white-50 mx-auto mb-4" style="max-width: 520px; font-size: 0.95rem;">
+                                                    Vui lòng dán <b>đường link thư mục Google Drive</b> mà Studio đã cung cấp cho bạn vào ô tìm kiếm bên trên và bấm <b>"Mở Album Ảnh"</b> để xem và chọn ảnh.
+                                                </p>
+                                                <div class="row g-3 justify-content-center mx-auto" style="max-width: 680px;">
+                                                    <div class="col-12 col-md-4">
+                                                        <div class="p-3 h-100 rounded-3 text-start" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
+                                                            <div class="text-info fw-bold mb-1"><i class="bi bi-link-45deg me-1"></i> 1. Dán Link</div>
+                                                            <div class="text-white-50 small">Dán link thư mục Google Drive ảnh do Studio gửi.</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-4">
+                                                        <div class="p-3 h-100 rounded-3 text-start" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
+                                                            <div class="text-warning fw-bold mb-1"><i class="bi bi-check2-circle me-1"></i> 2. Chọn Ảnh</div>
+                                                            <div class="text-white-50 small">Tích chọn các tấm ảnh ưng ý và ghi chú dặn dò.</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-4">
+                                                        <div class="p-3 h-100 rounded-3 text-start" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
+                                                            <div class="text-success fw-bold mb-1"><i class="bi bi-send-check me-1"></i> 3. Chốt Đơn</div>
+                                                            <div class="text-white-50 small">Bấm chốt danh sách để gửi Studio chỉnh sửa ngay.</div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        <% } } %>
+                                        <% } %>
 
                         </div>
 
