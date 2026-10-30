@@ -1521,7 +1521,7 @@
                                 <button class="btn-glass-sm" onclick="openOrderDetailModal(${index})" title="Xem chi tiết đơn & ghi chú">
                                     <i class="bi bi-eye"></i> Xem ghi chú
                                 </button>
-                                <a href="/tcController?txtLink=${encodeURIComponent(order.folderId)}&picks=${encodeURIComponent(getPhotoNamesFromOr(order.orString))}&action=view" target="_blank" class="btn-glass-sm" title="Mở album xem ảnh đã chọn">
+                                <a href="/tcController?txtLink=${encodeURIComponent(order.folderId)}&picks=${encodeURIComponent(getPhotoNamesFromOr(order.orString))}&orderId=${encodeURIComponent(order.orderId || '')}&action=view" target="_blank" class="btn-glass-sm" title="Mở album xem ảnh đã chọn">
                                     <i class="bi bi-box-arrow-up-right"></i>
                                 </a>
                                 <button class="btn-glass-sm text-warning" onclick="openEditOrderModal(${index})" title="Sửa thông tin đơn">
@@ -1600,7 +1600,7 @@
                                 </button>
                             </div>
                             <div class="col-6">
-                                <a href="/tcController?txtLink=${encodeURIComponent(order.folderId)}&picks=${encodeURIComponent(getPhotoNamesFromOr(order.orString))}&action=view" target="_blank" class="btn-glass-sm w-100 justify-content-center py-2 text-decoration-none">
+                                <a href="/tcController?txtLink=${encodeURIComponent(order.folderId)}&picks=${encodeURIComponent(getPhotoNamesFromOr(order.orString))}&orderId=${encodeURIComponent(order.orderId || '')}&action=view" target="_blank" class="btn-glass-sm w-100 justify-content-center py-2 text-decoration-none">
                                     <i class="bi bi-box-arrow-up-right text-success"></i> Xem ảnh chọn
                                 </a>
                             </div>
@@ -1714,7 +1714,7 @@
             }
 
             const openWebBtn = document.getElementById("btnDetailOpenWeb");
-            openWebBtn.href = "/tcController?txtLink=" + encodeURIComponent(order.folderId) + "&picks=" + encodeURIComponent(getPhotoNamesFromOr(order.orString)) + "&action=view";
+            openWebBtn.href = "/tcController?txtLink=" + encodeURIComponent(order.folderId) + "&picks=" + encodeURIComponent(getPhotoNamesFromOr(order.orString)) + "&orderId=" + encodeURIComponent(order.orderId || '') + "&action=view";
 
             document.getElementById("orderDetailModal").classList.add("active");
         }
@@ -2265,6 +2265,7 @@
             const picks = getPhotoNamesFromOr(currentDetailOrder.orString);
             let longUrl = host + "/?id=" + encodeURIComponent(currentDetailOrder.folderId);
             if (picks) longUrl += "&picks=" + encodeURIComponent(picks);
+            if (currentDetailOrder.orderId) longUrl += "&orderId=" + encodeURIComponent(currentDetailOrder.orderId);
 
             const shortUrl = await getShortLinkForUrl(longUrl);
             await copyTextToClipboard(shortUrl);
@@ -2342,10 +2343,12 @@
 
                     let totalClientPicks = 0;
                     let pickList = [];
+                    let matchingOrderId = "";
                     matchingOrders.forEach(mo => {
                         totalClientPicks += (mo.selectedCount || 0);
                         const p = getPhotoNamesFromOr(mo.orString);
                         if (p) pickList.push(p);
+                        if (!matchingOrderId && mo.orderId) matchingOrderId = mo.orderId;
                     });
                     const combinedPicks = pickList.join(",");
 
@@ -2363,7 +2366,7 @@
                             ${album.note ? `<div class="text-secondary small mb-2 text-truncate fst-italic" title="${escapeAttr(String(album.note))}">📝 ${escapeHtml(String(album.note))}</div>` : '<div class="mb-2"></div>'}
 
                             ${totalClientPicks > 0 ? `
-                                <a href="/tcController?txtLink=${encodeURIComponent(albumId)}&picks=${encodeURIComponent(combinedPicks)}&action=view" target="_blank" class="btn-album-customer-picks" title="Xem ${totalClientPicks} ảnh khách đã chốt cho album này">
+                                <a href="/tcController?txtLink=${encodeURIComponent(albumId)}&picks=${encodeURIComponent(combinedPicks)}${matchingOrderId ? '&orderId=' + encodeURIComponent(matchingOrderId) : ''}&action=view" target="_blank" class="btn-album-customer-picks" title="Xem ${totalClientPicks} ảnh khách đã chốt cho album này">
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="picks-count-pill"><i class="bi bi-check-lg"></i> ${totalClientPicks}</span>
                                         <span class="text-white fw-bold">Khách đã chốt</span>
