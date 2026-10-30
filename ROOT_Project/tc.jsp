@@ -1653,6 +1653,27 @@
                             }
                             <% } %>
 
+                            // Hàm an toàn mã hóa HTML và JavaScript trên trình duyệt (client-side)
+                            function escapeHtml(str) {
+                                if (str === null || str === undefined) return "";
+                                return String(str)
+                                    .replace(/&/g, "&amp;")
+                                    .replace(/</g, "&lt;")
+                                    .replace(/>/g, "&gt;")
+                                    .replace(/"/g, "&quot;")
+                                    .replace(/'/g, "&#039;");
+                            }
+
+                            function escapeJs(str) {
+                                if (str === null || str === undefined) return "";
+                                return String(str)
+                                    .replace(/\\/g, "\\\\")
+                                    .replace(/'/g, "\\'")
+                                    .replace(/"/g, "\\\"")
+                                    .replace(/\n/g, "\\n")
+                                    .replace(/\r/g, "\\r");
+                            }
+
                             // Chuẩn hóa tên ảnh (bỏ đuôi, bỏ dấu cách thừa để so sánh chuẩn xác)
                             function cleanPhotoName(n) {
                                 if (!n && n !== 0) return '';
@@ -1753,114 +1774,118 @@
 
                             // Cập nhật giao diện Nút tròn nổi & Khung chi tiết Comment
                             function updateFloatingCommentUI() {
-                                let noteKeys = [];
-                                if (photoNotes && typeof photoNotes === 'object') {
-                                    noteKeys = Object.keys(photoNotes).filter(k => photoNotes[k] && String(photoNotes[k]).trim().length > 0);
-                                }
-                                const hasGenNote = currentGeneralNote && currentGeneralNote.trim().length > 0;
-                                const totalCount = noteKeys.length + (hasGenNote ? 1 : 0);
-
-                                // 1. Cập nhật Badge trên nút tròn nổi
-                                const btn = document.getElementById("btnFloatingComments");
-                                const badge = document.getElementById("floatingCommentBadge");
-                                if (badge) {
-                                    badge.innerText = totalCount;
-                                    badge.style.display = totalCount > 0 ? "flex" : "none";
-                                }
-                                if (btn) {
-                                    if (totalCount > 0) {
-                                        btn.classList.add("has-notes");
-                                        btn.title = "Xem " + totalCount + " ghi chú & dặn dò của khách";
-                                    } else {
-                                        btn.classList.remove("has-notes");
-                                        btn.title = "Ghi chú & dặn dò (Bấm để xem)";
+                                try {
+                                    let noteKeys = [];
+                                    if (photoNotes && typeof photoNotes === 'object') {
+                                        noteKeys = Object.keys(photoNotes).filter(k => photoNotes[k] && String(photoNotes[k]).trim().length > 0);
                                     }
-                                }
+                                    const hasGenNote = currentGeneralNote && currentGeneralNote.trim().length > 0;
+                                    const totalCount = noteKeys.length + (hasGenNote ? 1 : 0);
 
-                                // 2. Cập nhật nút trên Banner phía trên (nếu có)
-                                const bannerNotesBtn = document.getElementById("btnBannerViewNotes");
-                                const bannerNotesCount = document.getElementById("bannerNotesCount");
-                                if (bannerNotesBtn && bannerNotesCount) {
-                                    bannerNotesCount.innerText = totalCount;
-                                    bannerNotesBtn.style.display = totalCount > 0 ? "inline-flex" : "none";
-                                }
-
-                                // 2b. Cập nhật các nút Lọc ảnh ghi chú (dành cho thợ & admin)
-                                const showNotedBtn = document.getElementById("btnShowNoted");
-                                const badgeBtnShowNoted = document.getElementById("badgeBtnShowNoted");
-                                const bannerFilterNoted = document.getElementById("btnBannerFilterNoted");
-
-                                if (badgeBtnShowNoted) {
-                                    badgeBtnShowNoted.innerText = noteKeys.length;
-                                    badgeBtnShowNoted.style.display = noteKeys.length > 0 ? "inline-block" : "none";
-                                }
-                                if (showNotedBtn) {
-                                    showNotedBtn.title = noteKeys.length > 0 ? ("Chỉ hiển thị " + noteKeys.length + " ảnh có ghi chú dặn dò") : "Chưa có ảnh nào có ghi chú";
-                                }
-                                if (bannerFilterNoted) {
-                                    bannerFilterNoted.style.display = noteKeys.length > 0 ? "inline-flex" : "none";
-                                    if (!isShowingNotedOnly) {
-                                        bannerFilterNoted.innerHTML = '<i class="bi bi-funnel me-1"></i> Lọc ảnh ghi chú (' + noteKeys.length + ')';
+                                    // 1. Cập nhật Badge trên nút tròn nổi
+                                    const btn = document.getElementById("btnFloatingComments");
+                                    const badge = document.getElementById("floatingCommentBadge");
+                                    if (badge) {
+                                        badge.innerText = totalCount;
+                                        badge.style.display = totalCount > 0 ? "flex" : "none";
                                     }
-                                }
-
-                                // 3. Cập nhật nội dung bên trong Panel nổi
-                                const subtitleEl = document.getElementById("commentsPanelSubtitle");
-                                if (subtitleEl) {
-                                    let sub = "";
-                                    if (currentClientName) sub += "Khách: " + currentClientName;
-                                    if (currentClientPhone) sub += (sub ? " • " : "") + currentClientPhone;
-                                    if (currentOrderId) sub += (sub ? " • " : "") + "#" + currentOrderId;
-                                    subtitleEl.innerText = sub || "Ghi chú cho album này";
-                                }
-
-                                const genBox = document.getElementById("panelGeneralNoteBox");
-                                const genText = document.getElementById("panelGeneralNoteText");
-                                if (genBox && genText) {
-                                    if (hasGenNote) {
-                                        genBox.style.display = "block";
-                                        genText.innerText = currentGeneralNote.trim();
-                                    } else {
-                                        genBox.style.display = "none";
+                                    if (btn) {
+                                        if (totalCount > 0) {
+                                            btn.classList.add("has-notes");
+                                            btn.title = "Xem " + totalCount + " ghi chú & dặn dò của khách";
+                                        } else {
+                                            btn.classList.remove("has-notes");
+                                            btn.title = "Ghi chú & dặn dò (Bấm để xem)";
+                                        }
                                     }
-                                }
 
-                                const pCountEl = document.getElementById("panelNotesCount");
-                                if (pCountEl) pCountEl.innerText = noteKeys.length;
+                                    // 2. Cập nhật nút trên Banner phía trên (nếu có)
+                                    const bannerNotesBtn = document.getElementById("btnBannerViewNotes");
+                                    const bannerNotesCount = document.getElementById("bannerNotesCount");
+                                    if (bannerNotesBtn && bannerNotesCount) {
+                                        bannerNotesCount.innerText = totalCount;
+                                        bannerNotesBtn.style.display = totalCount > 0 ? "inline-flex" : "none";
+                                    }
 
-                                const listEl = document.getElementById("panelPhotoNotesList");
-                                if (listEl) {
-                                    if (noteKeys.length === 0 && !hasGenNote) {
-                                        listEl.innerHTML = `
-                                            <div class="text-center py-4 text-secondary">
-                                                <i class="bi bi-chat-square-dots fs-3 d-block mb-2 text-info opacity-50"></i>
-                                                <div class="small text-white">Chưa có ghi chú nào cho album này.</div>
-                                                <div class="text-white-50" style="font-size: 0.72rem; margin-top: 4px;">Bấm vào từng ảnh để để lại ghi chú dặn dò.</div>
-                                            </div>
-                                        `;
-                                    } else if (noteKeys.length === 0) {
-                                        listEl.innerHTML = `
-                                            <div class="text-center py-3 text-secondary">
-                                                <div class="small text-white-50">Không có ghi chú riêng cho từng tấm ảnh.</div>
-                                            </div>
-                                        `;
-                                    } else {
-                                        let html = "";
-                                        noteKeys.forEach(k => {
-                                            const comment = photoNotes[k];
-                                            const cleanName = cleanPhotoName(k);
-                                            html += `
-                                                <div class="panel-note-item" onclick="openPhotoByName('${escapeJs(k)}')" title="Bấm để mở xem ảnh này">
-                                                    <div class="panel-note-item-top">
-                                                        <span class="panel-note-photo-name"><i class="bi bi-image text-info"></i> ${escapeHtml(k)}</span>
-                                                        <span class="panel-note-action-hint"><i class="bi bi-box-arrow-up-right"></i> Xem ảnh</span>
-                                                    </div>
-                                                    <div class="panel-note-text">"${escapeHtml(comment)}"</div>
+                                    // 2b. Cập nhật các nút Lọc ảnh ghi chú (dành cho thợ & admin)
+                                    const showNotedBtn = document.getElementById("btnShowNoted");
+                                    const badgeBtnShowNoted = document.getElementById("badgeBtnShowNoted");
+                                    const bannerFilterNoted = document.getElementById("btnBannerFilterNoted");
+
+                                    if (badgeBtnShowNoted) {
+                                        badgeBtnShowNoted.innerText = noteKeys.length;
+                                        badgeBtnShowNoted.style.display = noteKeys.length > 0 ? "inline-block" : "none";
+                                    }
+                                    if (showNotedBtn) {
+                                        showNotedBtn.title = noteKeys.length > 0 ? ("Chỉ hiển thị " + noteKeys.length + " ảnh có ghi chú dặn dò") : "Chưa có ảnh nào có ghi chú";
+                                    }
+                                    if (bannerFilterNoted) {
+                                        bannerFilterNoted.style.display = noteKeys.length > 0 ? "inline-flex" : "none";
+                                        if (!isShowingNotedOnly) {
+                                            bannerFilterNoted.innerHTML = '<i class="bi bi-funnel me-1"></i> Lọc ảnh ghi chú (' + noteKeys.length + ')';
+                                        }
+                                    }
+
+                                    // 3. Cập nhật nội dung bên trong Panel nổi
+                                    const subtitleEl = document.getElementById("commentsPanelSubtitle");
+                                    if (subtitleEl) {
+                                        let sub = "";
+                                        if (currentClientName) sub += "Khách: " + currentClientName;
+                                        if (currentClientPhone) sub += (sub ? " • " : "") + currentClientPhone;
+                                        if (currentOrderId) sub += (sub ? " • " : "") + "#" + currentOrderId;
+                                        subtitleEl.innerText = sub || "Ghi chú cho album này";
+                                    }
+
+                                    const genBox = document.getElementById("panelGeneralNoteBox");
+                                    const genText = document.getElementById("panelGeneralNoteText");
+                                    if (genBox && genText) {
+                                        if (hasGenNote) {
+                                            genBox.style.display = "block";
+                                            genText.innerText = currentGeneralNote.trim();
+                                        } else {
+                                            genBox.style.display = "none";
+                                        }
+                                    }
+
+                                    const pCountEl = document.getElementById("panelNotesCount");
+                                    if (pCountEl) pCountEl.innerText = noteKeys.length;
+
+                                    const listEl = document.getElementById("panelPhotoNotesList");
+                                    if (listEl) {
+                                        if (noteKeys.length === 0 && !hasGenNote) {
+                                            listEl.innerHTML = `
+                                                <div class="text-center py-4 text-secondary">
+                                                    <i class="bi bi-chat-square-dots fs-3 d-block mb-2 text-info opacity-50"></i>
+                                                    <div class="small text-white">Chưa có ghi chú nào cho album này.</div>
+                                                    <div class="text-white-50" style="font-size: 0.72rem; margin-top: 4px;">Bấm vào từng ảnh để để lại ghi chú dặn dò.</div>
                                                 </div>
                                             `;
-                                        });
-                                        listEl.innerHTML = html;
+                                        } else if (noteKeys.length === 0) {
+                                            listEl.innerHTML = `
+                                                <div class="text-center py-3 text-secondary">
+                                                    <div class="small text-white-50">Không có ghi chú riêng cho từng tấm ảnh.</div>
+                                                </div>
+                                            `;
+                                        } else {
+                                            let html = "";
+                                            noteKeys.forEach(k => {
+                                                const comment = photoNotes[k];
+                                                const cleanName = cleanPhotoName(k);
+                                                html += `
+                                                    <div class="panel-note-item" onclick="openPhotoByName('${escapeJs(k)}')" title="Bấm để mở xem ảnh này">
+                                                        <div class="panel-note-item-top">
+                                                            <span class="panel-note-photo-name"><i class="bi bi-image text-info"></i> ${escapeHtml(k)}</span>
+                                                            <span class="panel-note-action-hint"><i class="bi bi-box-arrow-up-right"></i> Xem ảnh</span>
+                                                        </div>
+                                                        <div class="panel-note-text">"${escapeHtml(comment)}"</div>
+                                                    </div>
+                                                `;
+                                            });
+                                            listEl.innerHTML = html;
+                                        }
                                     }
+                                } catch (e) {
+                                    console.warn("Lỗi updateFloatingCommentUI:", e);
                                 }
                             }
 
@@ -1958,55 +1983,60 @@
                             const zoomBadge = document.getElementById('zoomBadge');
 
                             document.addEventListener("DOMContentLoaded", function () {
-                                loadSelectionFromStorage();
-                                loadNotesFromStorage();
-                                initOrderData();
-
-                                // Đọc danh sách ảnh được chia sẻ qua URL (?picks=...)
                                 const urlParams = new URLSearchParams(window.location.search);
                                 const picks = urlParams.get('picks');
-                                if (picks && typeof allImagesData !== 'undefined') {
-                                    // Xóa lựa chọn cũ trên máy để hiển thị chuẩn xác 100% danh sách ảnh từ link này
-                                    selectedItems.clear();
-                                    document.querySelectorAll('.photo-card.selected').forEach(c => c.classList.remove('selected'));
 
-                                    const rawTokens = picks.split(/\s*,+\s*|\s+or\s+/i).map(p => p.trim()).filter(Boolean);
-                                    const pickedCleanSet = new Set(rawTokens.map(p => cleanPhotoName(p)).filter(Boolean));
-                                    const pickedRawSet = new Set(rawTokens.map(p => decodeURIComponent(String(p)).trim().toLowerCase()).filter(Boolean));
-                                    
-                                    let matchCount = 0;
-                                    allImagesData.forEach(imgData => {
-                                        const raw = String(imgData.name || '').trim().toLowerCase();
-                                        const clean = cleanPhotoName(imgData.name);
-                                        if (pickedCleanSet.has(clean) || pickedRawSet.has(raw)) {
-                                            const card = document.getElementById(imgData.cardId);
-                                            if (card) {
-                                                selectCard(card);
-                                                matchCount++;
-                                            }
-                                        }
-                                    });
+                                try { loadSelectionFromStorage(); } catch (e) { console.warn("Lỗi loadSelectionFromStorage:", e); }
+                                try { loadNotesFromStorage(); } catch (e) { console.warn("Lỗi loadNotesFromStorage:", e); }
+                                try { initOrderData(); } catch (e) { console.warn("Lỗi initOrderData:", e); }
 
-                                    if (matchCount > 0) {
-                                        const banner = document.getElementById('picksBanner');
-                                        if (banner) {
-                                            banner.style.display = 'flex';
-                                            const countBadge = document.getElementById('picksBannerCount');
-                                            if (countBadge) countBadge.innerText = matchCount;
-                                        }
-                                        // Tự động chuyển sang chế độ xem riêng các ảnh đã chọn
-                                        setTimeout(() => {
-                                            if (!isShowingSelectedOnly) {
-                                                toggleShowSelectedOnly();
+                                // Đọc danh sách ảnh được chia sẻ qua URL (?picks=...)
+                                try {
+                                    if (picks && typeof allImagesData !== 'undefined') {
+                                        // Xóa lựa chọn cũ trên máy để hiển thị chuẩn xác 100% danh sách ảnh từ link này
+                                        selectedItems.clear();
+                                        document.querySelectorAll('.photo-card.selected').forEach(c => c.classList.remove('selected'));
+
+                                        const rawTokens = picks.split(/\s*,+\s*|\s+or\s+/i).map(p => p.trim()).filter(Boolean);
+                                        const pickedCleanSet = new Set(rawTokens.map(p => cleanPhotoName(p)).filter(Boolean));
+                                        const pickedRawSet = new Set(rawTokens.map(p => decodeURIComponent(String(p)).trim().toLowerCase()).filter(Boolean));
+                                        
+                                        let matchCount = 0;
+                                        allImagesData.forEach(imgData => {
+                                            const raw = String(imgData.name || '').trim().toLowerCase();
+                                            const clean = cleanPhotoName(imgData.name);
+                                            if (pickedCleanSet.has(clean) || pickedRawSet.has(raw)) {
+                                                const card = document.getElementById(imgData.cardId);
+                                                if (card) {
+                                                    selectCard(card);
+                                                    matchCount++;
+                                                }
                                             }
-                                        }, 100);
+                                        });
+
+                                        if (matchCount > 0) {
+                                            const banner = document.getElementById('picksBanner');
+                                            if (banner) {
+                                                banner.style.display = 'flex';
+                                                const countBadge = document.getElementById('picksBannerCount');
+                                                if (countBadge) countBadge.innerText = matchCount;
+                                            }
+                                            // Tự động chuyển sang chế độ xem riêng các ảnh đã chọn
+                                            setTimeout(() => {
+                                                if (!isShowingSelectedOnly) {
+                                                    toggleShowSelectedOnly();
+                                                }
+                                            }, 100);
+                                        }
                                     }
+                                } catch (e) {
+                                    console.warn("Lỗi xử lý picks từ URL:", e);
                                 }
 
-                                updateFloatingBar();
-                                initZoomAndGestures();
-                                initKeyboardShortcuts();
-                                initClientSideSearch();
+                                try { updateFloatingBar(); } catch (e) { console.warn("Lỗi updateFloatingBar:", e); }
+                                try { initZoomAndGestures(); } catch (e) { console.warn("Lỗi initZoomAndGestures:", e); }
+                                try { initKeyboardShortcuts(); } catch (e) { console.warn("Lỗi initKeyboardShortcuts:", e); }
+                                try { initClientSideSearch(); } catch (e) { console.warn("Lỗi initClientSideSearch:", e); }
 
                                 // Tự động làm gọn thanh địa chỉ trên trình duyệt thành link sạch https://.../?id=...
                                 if (FOLDER_ID && window.history && window.history.replaceState) {
@@ -2019,7 +2049,7 @@
                                         if (curOid) newSearch += '&orderId=' + encodeURIComponent(curOid);
                                         window.history.replaceState(null, '', cleanPath + newSearch);
                                     } catch (e) {
-                                        console.warn("Lỗi cập nhật URL", e);
+                                        console.warn("Lỗi cập nhật URL:", e);
                                     }
                                 }
 
