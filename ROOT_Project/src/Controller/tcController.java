@@ -859,6 +859,31 @@ public class tcController extends HttpServlet {
 
         // 8. Chuyển tiếp kết quả về trang tc.jsp để hiển thị
         ensureAlbumsLoaded(request);
+        ensureOrdersLoaded(request);
+
+        // Tìm đơn chốt ảnh tương ứng (nếu có orderId hoặc folderId) để truyền comment / ghi chú sang tc.jsp
+        String reqOrderId = request.getParameter("orderId");
+        OrderRecord matchedOrder = null;
+        if (reqOrderId != null && !reqOrderId.trim().isEmpty()) {
+            for (OrderRecord o : ORDER_STORE) {
+                if (reqOrderId.trim().equalsIgnoreCase(o.orderId)) {
+                    matchedOrder = o;
+                    break;
+                }
+            }
+        }
+        if (matchedOrder == null && folderId != null && !folderId.trim().isEmpty()) {
+            for (OrderRecord o : ORDER_STORE) {
+                if (folderId.trim().equalsIgnoreCase(o.folderId)) {
+                    matchedOrder = o;
+                    break;
+                }
+            }
+        }
+        if (matchedOrder != null) {
+            request.setAttribute("matchedOrderJson", matchedOrder.toJson(1));
+        }
+
         request.setAttribute("studioAlbums", CUSTOM_ALBUMS);
         request.setAttribute("dsAnh", filteredImages);
         request.setAttribute("currentId", folderId);

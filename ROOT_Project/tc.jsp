@@ -855,6 +855,293 @@
                                 .custom-modal-box .form-control {
                                     font-size: 16px !important;
                                 }
+                                /* 9. Nút Tròn Nổi & Khung Xem Ghi Chú / Comment Khách (VisionOS Style) */
+                                .floating-comment-wrapper {
+                                    bottom: 80px !important;
+                                    right: 14px !important;
+                                }
+                                .btn-floating-comments {
+                                    width: 46px !important;
+                                    height: 46px !important;
+                                    font-size: 20px !important;
+                                }
+                                .floating-comments-panel {
+                                    bottom: 135px !important;
+                                    right: 10px !important;
+                                    left: 10px !important;
+                                    width: auto !important;
+                                    max-width: min(420px, calc(100vw - 20px)) !important;
+                                    margin: 0 auto !important;
+                                    max-height: 60vh !important;
+                                }
+                                .comments-panel-body {
+                                    max-height: calc(60vh - 65px) !important;
+                                }
+                            }
+
+                            /* ==================================================== */
+                            /* NÚT TRÒN NỔI & BẢNG COMMENT / GHI CHÚ KHÁCH HÀNG */
+                            /* ==================================================== */
+                            .floating-comment-wrapper {
+                                position: fixed;
+                                bottom: 95px;
+                                right: 24px;
+                                z-index: 1040;
+                                transition: transform 0.3s ease;
+                            }
+
+                            .btn-floating-comments {
+                                width: 52px;
+                                height: 52px;
+                                border-radius: 50%;
+                                background: linear-gradient(135deg, rgba(14, 165, 233, 0.95) 0%, rgba(2, 132, 199, 0.98) 100%);
+                                backdrop-filter: blur(20px);
+                                -webkit-backdrop-filter: blur(20px);
+                                border: 2px solid rgba(255, 255, 255, 0.4);
+                                color: #ffffff;
+                                font-size: 22px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                cursor: pointer;
+                                box-shadow: 0 10px 28px rgba(14, 165, 233, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+                                transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                                position: relative;
+                                outline: none;
+                            }
+
+                            .btn-floating-comments:hover {
+                                transform: scale(1.08) translateY(-2px);
+                                box-shadow: 0 14px 34px rgba(14, 165, 233, 0.7);
+                                color: #ffffff;
+                            }
+
+                            .btn-floating-comments.has-notes {
+                                animation: commentPulse 2.8s infinite ease-in-out;
+                            }
+
+                            @keyframes commentPulse {
+                                0%, 100% {
+                                    box-shadow: 0 10px 28px rgba(14, 165, 233, 0.5);
+                                }
+                                50% {
+                                    box-shadow: 0 10px 32px rgba(245, 158, 11, 0.75), 0 0 0 5px rgba(245, 158, 11, 0.2);
+                                }
+                            }
+
+                            .comment-badge {
+                                position: absolute;
+                                top: -4px;
+                                right: -4px;
+                                background: #ef4444;
+                                color: #ffffff;
+                                font-size: 0.72rem;
+                                font-weight: 800;
+                                min-width: 22px;
+                                height: 22px;
+                                border-radius: 11px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                padding: 0 5px;
+                                border: 2px solid #0b0f17;
+                                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+                            }
+
+                            /* Bảng nổi chi tiết ghi chú & dặn dò (VisionOS Panel) */
+                            .floating-comments-panel {
+                                position: fixed;
+                                bottom: 155px;
+                                right: 24px;
+                                width: 380px;
+                                max-height: 520px;
+                                background: rgba(15, 23, 42, 0.94);
+                                backdrop-filter: blur(28px);
+                                -webkit-backdrop-filter: blur(28px);
+                                border: 1px solid rgba(255, 255, 255, 0.18);
+                                border-top: 1px solid rgba(56, 189, 248, 0.5);
+                                border-radius: 20px;
+                                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(14, 165, 233, 0.2);
+                                z-index: 1045;
+                                display: flex;
+                                flex-direction: column;
+                                overflow: hidden;
+                                animation: panelPopIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                            }
+
+                            @keyframes panelPopIn {
+                                from {
+                                    opacity: 0;
+                                    transform: scale(0.92) translateY(14px);
+                                }
+                                to {
+                                    opacity: 1;
+                                    transform: scale(1) translateY(0);
+                                }
+                            }
+
+                            .comments-panel-header {
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                padding: 12px 16px;
+                                background: rgba(255, 255, 255, 0.04);
+                                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                            }
+
+                            .comments-panel-icon {
+                                width: 34px;
+                                height: 34px;
+                                border-radius: 10px;
+                                background: rgba(14, 165, 233, 0.2);
+                                color: #38bdf8;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 16px;
+                                flex-shrink: 0;
+                            }
+
+                            .comments-panel-title {
+                                font-size: 0.92rem;
+                                font-weight: 700;
+                                color: #f8fafc;
+                                letter-spacing: 0.2px;
+                            }
+
+                            .comments-panel-subtitle {
+                                font-size: 0.75rem;
+                                color: #94a3b8;
+                            }
+
+                            .btn-hide-panel {
+                                background: rgba(255, 255, 255, 0.08);
+                                border: 1px solid rgba(255, 255, 255, 0.16);
+                                color: #cbd5e1;
+                                font-size: 0.75rem;
+                                font-weight: 600;
+                                padding: 5px 10px;
+                                border-radius: 10px;
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 4px;
+                                cursor: pointer;
+                                transition: all 0.2s;
+                            }
+
+                            .btn-hide-panel:hover {
+                                background: rgba(255, 255, 255, 0.18);
+                                color: #ffffff;
+                            }
+
+                            .comments-panel-body {
+                                padding: 14px 16px;
+                                overflow-y: auto;
+                                max-height: 440px;
+                                display: flex;
+                                flex-direction: column;
+                                gap: 10px;
+                            }
+
+                            .panel-section-box {
+                                background: rgba(245, 158, 11, 0.1);
+                                border: 1px solid rgba(245, 158, 11, 0.3);
+                                border-radius: 12px;
+                                padding: 10px 12px;
+                            }
+
+                            .panel-section-box .section-label {
+                                font-size: 0.78rem;
+                                font-weight: 700;
+                                color: #fcd34d;
+                                margin-bottom: 4px;
+                            }
+
+                            .panel-section-box .section-content {
+                                font-size: 0.84rem;
+                                line-height: 1.4;
+                                white-space: pre-wrap;
+                                word-break: break-word;
+                            }
+
+                            .btn-copy-notes-sm {
+                                background: rgba(56, 189, 248, 0.15);
+                                border: 1px solid rgba(56, 189, 248, 0.3);
+                                color: #38bdf8;
+                                font-size: 0.72rem;
+                                font-weight: 600;
+                                padding: 3px 8px;
+                                border-radius: 8px;
+                                cursor: pointer;
+                                transition: all 0.2s;
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 4px;
+                            }
+
+                            .btn-copy-notes-sm:hover {
+                                background: rgba(56, 189, 248, 0.3);
+                                color: #ffffff;
+                            }
+
+                            .panel-notes-list {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 8px;
+                            }
+
+                            .panel-note-item {
+                                background: rgba(30, 41, 59, 0.6);
+                                border: 1px solid rgba(255, 255, 255, 0.08);
+                                border-radius: 12px;
+                                padding: 10px 12px;
+                                cursor: pointer;
+                                transition: all 0.2s ease;
+                                display: flex;
+                                flex-direction: column;
+                                gap: 4px;
+                            }
+
+                            .panel-note-item:hover {
+                                background: rgba(30, 41, 59, 0.9);
+                                border-color: rgba(56, 189, 248, 0.4);
+                                transform: translateX(2px);
+                            }
+
+                            .panel-note-item-top {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                            }
+
+                            .panel-note-photo-name {
+                                font-size: 0.8rem;
+                                font-weight: 700;
+                                font-family: monospace;
+                                color: #38bdf8;
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 5px;
+                            }
+
+                            .panel-note-action-hint {
+                                font-size: 0.7rem;
+                                color: #64748b;
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 2px;
+                            }
+
+                            .panel-note-item:hover .panel-note-action-hint {
+                                color: #94a3b8;
+                            }
+
+                            .panel-note-text {
+                                font-size: 0.82rem;
+                                color: #f1f5f9;
+                                line-height: 1.35;
+                                word-break: break-word;
+                                font-style: italic;
                             }
                         </style>
                     </head>
@@ -965,6 +1252,9 @@
                                             <button id="btnShowSelected" class="btn btn-sm btn-outline-info rounded-pill px-3" onclick="toggleShowSelectedOnly()">
                                                 <i class="bi bi-funnel me-1"></i> Xem ảnh đã chọn
                                             </button>
+                                            <button id="btnShowNoted" class="btn btn-sm btn-outline-warning rounded-pill px-3" onclick="toggleShowNotedOnly()" title="Chỉ hiển thị các ảnh có ghi chú dặn dò">
+                                                <i class="bi bi-chat-left-dots-fill me-1"></i> Ảnh có ghi chú <span id="badgeBtnShowNoted" class="badge bg-warning text-dark rounded-pill ms-1" style="display: none;">0</span>
+                                            </button>
                                             <button id="btnShare" class="btn btn-sm btn-outline-warning rounded-pill px-3" onclick="shortenAndCopyLink()">
                                                 <i class="bi bi-share-fill me-1"></i> Chia sẻ link
                                             </button>
@@ -989,6 +1279,12 @@
                                                 </div>
                                             </div>
                                             <div class="d-flex gap-2 ms-auto flex-shrink-0">
+                                                <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-2 py-1" onclick="toggleCommentsDrawer()" id="btnBannerViewNotes" style="display: none;" title="Xem ghi chú của khách">
+                                                    <i class="bi bi-chat-left-text-fill me-1"></i> Ghi chú (<span id="bannerNotesCount">0</span>)
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-2 py-1" onclick="toggleShowNotedOnly()" id="btnBannerFilterNoted" style="display: none;" title="Chỉ hiển thị các ảnh có ghi chú dặn dò">
+                                                    <i class="bi bi-funnel me-1"></i> Lọc ảnh ghi chú
+                                                </button>
                                                 <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-2 py-1" onclick="showAllPhotosFromBanner()" id="btnBannerShowAll" title="Xem tất cả">
                                                     <i class="bi bi-grid-fill me-1"></i> Tất cả
                                                 </button>
@@ -1270,6 +1566,60 @@
                         </div>
 
                         <!-- ==================================================== -->
+                        <!-- NÚT TRÒN NỔI & BẢNG COMMENT / GHI CHÚ CỦA KHÁCH -->
+                        <!-- ==================================================== -->
+                        <div id="floatingCommentWrapper" class="floating-comment-wrapper">
+                            <button type="button" id="btnFloatingComments" class="btn-floating-comments" onclick="toggleCommentsDrawer()" title="Xem ghi chú &amp; dặn dò của khách">
+                                <i class="bi bi-chat-heart-fill"></i>
+                                <span id="floatingCommentBadge" class="comment-badge" style="display: none;">0</span>
+                            </button>
+                        </div>
+
+                        <!-- Bảng nổi chi tiết ghi chú & dặn dò (VisionOS Style, có thể cất đi, không làm vỡ giao diện) -->
+                        <div id="floatingCommentsPanel" class="floating-comments-panel" style="display: none;">
+                            <div class="comments-panel-header">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="comments-panel-icon">
+                                        <i class="bi bi-chat-left-text-fill"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="comments-panel-title mb-0">Ghi Chú &amp; Dặn Dò</h6>
+                                        <div class="comments-panel-subtitle" id="commentsPanelSubtitle">Khách hàng</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-hide-panel" onclick="toggleCommentsDrawer()" title="Cất bảng này đi">
+                                    <i class="bi bi-chevron-down"></i> <span>Cất đi</span>
+                                </button>
+                            </div>
+
+                            <div class="comments-panel-body" id="commentsPanelBody">
+                                <!-- Dặn dò chung -->
+                                <div id="panelGeneralNoteBox" class="panel-section-box" style="display: none;">
+                                    <div class="section-label">
+                                        <i class="bi bi-pin-angle-fill text-warning me-1"></i> Dặn dò chung của khách:
+                                    </div>
+                                    <div class="section-content text-warning" id="panelGeneralNoteText"></div>
+                                </div>
+
+                                <!-- Tiêu đề danh sách ghi chú từng ảnh -->
+                                <div class="d-flex justify-content-between align-items-center mt-1">
+                                    <span class="text-white-50 small fw-bold"><i class="bi bi-camera-fill text-info me-1"></i> Ghi chú từng ảnh (<span id="panelNotesCount" class="text-info">0</span>):</span>
+                                    <div class="d-flex gap-1">
+                                        <button type="button" class="btn-copy-notes-sm" onclick="toggleShowNotedOnly(); toggleCommentsDrawer();" title="Lọc chỉ hiển thị các ảnh này trên lưới">
+                                            <i class="bi bi-funnel-fill"></i> Lọc trên lưới
+                                        </button>
+                                        <button type="button" class="btn-copy-notes-sm" onclick="copyAllCommentsText()" title="Sao chép toàn bộ ghi chú">
+                                            <i class="bi bi-clipboard"></i> Copy
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Danh sách ảnh có ghi chú -->
+                                <div id="panelPhotoNotesList" class="panel-notes-list"></div>
+                            </div>
+                        </div>
+
+                        <!-- ==================================================== -->
                         <!-- SCRIPTS -->
                         <!-- ==================================================== -->
                         <script>
@@ -1284,6 +1634,43 @@
                             let photoNotes = {};
                             let currentImageIndex = 0;
                             let isShowingSelectedOnly = false;
+                            let isShowingNotedOnly = false;
+
+                            let currentClientName = "";
+                            let currentClientPhone = "";
+                            let currentGeneralNote = "";
+                            let currentOrderId = "";
+
+                            let serverMatchedOrder = null;
+                            <%
+                                String matchedOrderJson = (String) request.getAttribute("matchedOrderJson");
+                                if (matchedOrderJson != null && !matchedOrderJson.trim().isEmpty()) {
+                            %>
+                            try {
+                                serverMatchedOrder = <%= matchedOrderJson %>;
+                            } catch (e) {
+                                console.warn("Lỗi đọc đơn từ máy chủ:", e);
+                            }
+                            <% } %>
+
+                            // Chuẩn hóa tên ảnh (bỏ đuôi, bỏ dấu cách thừa để so sánh chuẩn xác)
+                            function cleanPhotoName(n) {
+                                if (!n && n !== 0) return '';
+                                return decodeURIComponent(String(n)).trim().toLowerCase().replace(/\.[a-zA-Z0-9]{2,5}$/, '');
+                            }
+
+                            // Tra cứu ghi chú của ảnh (hỗ trợ cả tìm chính xác hoặc không phân biệt hoa thường/đuôi file)
+                            function getNoteForPhoto(photoName) {
+                                if (!photoName || !photoNotes) return "";
+                                if (photoNotes[photoName]) return photoNotes[photoName];
+                                const cleanTarget = cleanPhotoName(photoName);
+                                for (let k in photoNotes) {
+                                    if (cleanPhotoName(k) === cleanTarget) {
+                                        return photoNotes[k];
+                                    }
+                                }
+                                return "";
+                            }
 
                             // --- QUẢN LÝ GHI CHÚ ẢNH (PHOTO NOTES) ---
                             function loadNotesFromStorage() {
@@ -1307,6 +1694,7 @@
                                     }
                                 } catch (e) {}
                                 updateAllCardNoteBadges();
+                                updateFloatingCommentUI();
                             }
 
                             function updateAllCardNoteBadges() {
@@ -1314,10 +1702,239 @@
                                 allImagesData.forEach((img, idx) => {
                                     const badge = document.getElementById("card-note-badge-" + idx);
                                     if (badge) {
-                                        const hasNote = photoNotes[img.name] && photoNotes[img.name].trim().length > 0;
+                                        const note = getNoteForPhoto(img.name);
+                                        const hasNote = note && note.trim().length > 0;
                                         badge.style.display = hasNote ? "inline-flex" : "none";
                                     }
                                 });
+                            }
+
+                            // Khởi tạo và hợp nhất dữ liệu đơn chọn ảnh (từ Server hoặc LocalStorage)
+                            function initOrderData() {
+                                let order = serverMatchedOrder;
+                                if (!order) {
+                                    try {
+                                        const localSaved = localStorage.getItem("latest_submitted_order_" + FOLDER_ID);
+                                        if (localSaved) order = JSON.parse(localSaved);
+                                    } catch(e) {}
+                                }
+                                if (order) {
+                                    currentClientName = order.clientName || "";
+                                    currentClientPhone = order.clientPhone || "";
+                                    currentGeneralNote = order.generalNote || "";
+                                    currentOrderId = order.orderId || "";
+
+                                    // Điền sẵn vào form
+                                    const nameEl = document.getElementById("orderClientName");
+                                    const phoneEl = document.getElementById("orderClientPhone");
+                                    const genNoteEl = document.getElementById("orderGeneralNote");
+                                    if (nameEl && !nameEl.value && currentClientName) nameEl.value = currentClientName;
+                                    if (phoneEl && !phoneEl.value && currentClientPhone) phoneEl.value = currentClientPhone;
+                                    if (genNoteEl && !genNoteEl.value && currentGeneralNote) genNoteEl.value = currentGeneralNote;
+
+                                    // Đồng bộ ghi chú ảnh của khách
+                                    let oNotes = order.notes;
+                                    if (typeof oNotes === 'string') {
+                                        try { oNotes = JSON.parse(oNotes); } catch(e) { oNotes = {}; }
+                                    }
+                                    if (oNotes && typeof oNotes === 'object') {
+                                        for (let k in oNotes) {
+                                            if (oNotes[k] && String(oNotes[k]).trim().length > 0) {
+                                                photoNotes[k] = String(oNotes[k]).trim();
+                                            }
+                                        }
+                                        saveNotesToStorage();
+                                updateFloatingCommentUI();
+                                    }
+                                }
+                                updateAllCardNoteBadges();
+                                updateFloatingCommentUI();
+                            }
+
+                            // Cập nhật giao diện Nút tròn nổi & Khung chi tiết Comment
+                            function updateFloatingCommentUI() {
+                                let noteKeys = [];
+                                if (photoNotes && typeof photoNotes === 'object') {
+                                    noteKeys = Object.keys(photoNotes).filter(k => photoNotes[k] && String(photoNotes[k]).trim().length > 0);
+                                }
+                                const hasGenNote = currentGeneralNote && currentGeneralNote.trim().length > 0;
+                                const totalCount = noteKeys.length + (hasGenNote ? 1 : 0);
+
+                                // 1. Cập nhật Badge trên nút tròn nổi
+                                const btn = document.getElementById("btnFloatingComments");
+                                const badge = document.getElementById("floatingCommentBadge");
+                                if (badge) {
+                                    badge.innerText = totalCount;
+                                    badge.style.display = totalCount > 0 ? "flex" : "none";
+                                }
+                                if (btn) {
+                                    if (totalCount > 0) {
+                                        btn.classList.add("has-notes");
+                                        btn.title = "Xem " + totalCount + " ghi chú & dặn dò của khách";
+                                    } else {
+                                        btn.classList.remove("has-notes");
+                                        btn.title = "Ghi chú & dặn dò (Bấm để xem)";
+                                    }
+                                }
+
+                                // 2. Cập nhật nút trên Banner phía trên (nếu có)
+                                const bannerNotesBtn = document.getElementById("btnBannerViewNotes");
+                                const bannerNotesCount = document.getElementById("bannerNotesCount");
+                                if (bannerNotesBtn && bannerNotesCount) {
+                                    bannerNotesCount.innerText = totalCount;
+                                    bannerNotesBtn.style.display = totalCount > 0 ? "inline-flex" : "none";
+                                }
+
+                                // 2b. Cập nhật các nút Lọc ảnh ghi chú (dành cho thợ & admin)
+                                const showNotedBtn = document.getElementById("btnShowNoted");
+                                const badgeBtnShowNoted = document.getElementById("badgeBtnShowNoted");
+                                const bannerFilterNoted = document.getElementById("btnBannerFilterNoted");
+
+                                if (badgeBtnShowNoted) {
+                                    badgeBtnShowNoted.innerText = noteKeys.length;
+                                    badgeBtnShowNoted.style.display = noteKeys.length > 0 ? "inline-block" : "none";
+                                }
+                                if (showNotedBtn) {
+                                    showNotedBtn.title = noteKeys.length > 0 ? ("Chỉ hiển thị " + noteKeys.length + " ảnh có ghi chú dặn dò") : "Chưa có ảnh nào có ghi chú";
+                                }
+                                if (bannerFilterNoted) {
+                                    bannerFilterNoted.style.display = noteKeys.length > 0 ? "inline-flex" : "none";
+                                    if (!isShowingNotedOnly) {
+                                        bannerFilterNoted.innerHTML = '<i class="bi bi-funnel me-1"></i> Lọc ảnh ghi chú (' + noteKeys.length + ')';
+                                    }
+                                }
+
+                                // 3. Cập nhật nội dung bên trong Panel nổi
+                                const subtitleEl = document.getElementById("commentsPanelSubtitle");
+                                if (subtitleEl) {
+                                    let sub = "";
+                                    if (currentClientName) sub += "Khách: " + currentClientName;
+                                    if (currentClientPhone) sub += (sub ? " • " : "") + currentClientPhone;
+                                    if (currentOrderId) sub += (sub ? " • " : "") + "#" + currentOrderId;
+                                    subtitleEl.innerText = sub || "Ghi chú cho album này";
+                                }
+
+                                const genBox = document.getElementById("panelGeneralNoteBox");
+                                const genText = document.getElementById("panelGeneralNoteText");
+                                if (genBox && genText) {
+                                    if (hasGenNote) {
+                                        genBox.style.display = "block";
+                                        genText.innerText = currentGeneralNote.trim();
+                                    } else {
+                                        genBox.style.display = "none";
+                                    }
+                                }
+
+                                const pCountEl = document.getElementById("panelNotesCount");
+                                if (pCountEl) pCountEl.innerText = noteKeys.length;
+
+                                const listEl = document.getElementById("panelPhotoNotesList");
+                                if (listEl) {
+                                    if (noteKeys.length === 0 && !hasGenNote) {
+                                        listEl.innerHTML = `
+                                            <div class="text-center py-4 text-secondary">
+                                                <i class="bi bi-chat-square-dots fs-3 d-block mb-2 text-info opacity-50"></i>
+                                                <div class="small text-white">Chưa có ghi chú nào cho album này.</div>
+                                                <div class="text-white-50" style="font-size: 0.72rem; margin-top: 4px;">Bấm vào từng ảnh để để lại ghi chú dặn dò.</div>
+                                            </div>
+                                        `;
+                                    } else if (noteKeys.length === 0) {
+                                        listEl.innerHTML = `
+                                            <div class="text-center py-3 text-secondary">
+                                                <div class="small text-white-50">Không có ghi chú riêng cho từng tấm ảnh.</div>
+                                            </div>
+                                        `;
+                                    } else {
+                                        let html = "";
+                                        noteKeys.forEach(k => {
+                                            const comment = photoNotes[k];
+                                            const cleanName = cleanPhotoName(k);
+                                            html += `
+                                                <div class="panel-note-item" onclick="openPhotoByName('${escapeJs(k)}')" title="Bấm để mở xem ảnh này">
+                                                    <div class="panel-note-item-top">
+                                                        <span class="panel-note-photo-name"><i class="bi bi-image text-info"></i> ${escapeHtml(k)}</span>
+                                                        <span class="panel-note-action-hint"><i class="bi bi-box-arrow-up-right"></i> Xem ảnh</span>
+                                                    </div>
+                                                    <div class="panel-note-text">"${escapeHtml(comment)}"</div>
+                                                </div>
+                                            `;
+                                        });
+                                        listEl.innerHTML = html;
+                                    }
+                                }
+                            }
+
+                            // Đóng / Mở Bảng Comment nổi (Cất đi bất kỳ lúc nào)
+                            function toggleCommentsDrawer() {
+                                const panel = document.getElementById("floatingCommentsPanel");
+                                if (!panel) return;
+                                const isShowing = (panel.style.display !== "none" && panel.style.display !== "");
+                                if (isShowing) {
+                                    panel.style.display = "none";
+                                } else {
+                                    updateFloatingCommentUI();
+                                    panel.style.display = "flex";
+                                }
+                            }
+
+                            // Mở modal xem ngay bức ảnh theo tên từ danh sách comment
+                            function openPhotoByName(name) {
+                                if (!name || typeof allImagesData === 'undefined') return;
+                                const cleanTarget = cleanPhotoName(name);
+                                let foundIdx = -1;
+                                for (let i = 0; i < allImagesData.length; i++) {
+                                    if (cleanPhotoName(allImagesData[i].name) === cleanTarget || allImagesData[i].name === name) {
+                                        foundIdx = i;
+                                        break;
+                                    }
+                                }
+                                if (foundIdx !== -1) {
+                                    const card = document.getElementById("card-" + foundIdx);
+                                    if (card) {
+                                        const col = card.closest('.col-6, .col-md-4, .col-lg-2');
+                                        if (col && col.classList.contains('d-none')) {
+                                            col.classList.remove('d-none');
+                                        }
+                                        try { card.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
+                                    }
+                                    openModalByIndex(foundIdx);
+                                } else {
+                                    alert("Ảnh " + name + " không nằm trong danh sách đang tải.");
+                                }
+                            }
+
+                            // Sao chép toàn bộ nội dung ghi chú & dặn dò
+                            async function copyAllCommentsText() {
+                                let lines = [];
+                                if (currentClientName || currentClientPhone) {
+                                    lines.push("👤 Khách hàng: " + (currentClientName || "") + (currentClientPhone ? " - SĐT: " + currentClientPhone : ""));
+                                }
+                                if (currentOrderId) {
+                                    lines.push("🆔 Mã đơn: #" + currentOrderId);
+                                }
+                                if (currentGeneralNote && currentGeneralNote.trim()) {
+                                    lines.push("📝 Dặn dò chung: " + currentGeneralNote.trim());
+                                }
+                                if (photoNotes) {
+                                    const keys = Object.keys(photoNotes).filter(k => photoNotes[k] && photoNotes[k].trim());
+                                    if (keys.length > 0) {
+                                        lines.push("📸 Ghi chú từng ảnh (" + keys.length + " ảnh):");
+                                        keys.forEach(k => {
+                                            lines.push("• " + k + ": " + photoNotes[k].trim());
+                                        });
+                                    }
+                                }
+                                const fullText = lines.join("\n");
+                                if (!fullText.trim()) {
+                                    alert("Chưa có ghi chú nào để sao chép!");
+                                    return;
+                                }
+                                try {
+                                    await navigator.clipboard.writeText(fullText);
+                                    alert("✅ Đã sao chép toàn bộ ghi chú:\n\n" + fullText);
+                                } catch(e) {
+                                    prompt("Sao chép ghi chú bên dưới:", fullText);
+                                }
                             }
 
                             // --- ZOOM & PAN ENGINE (CHUẨN GOOGLE DRIVE) ---
@@ -1343,6 +1960,7 @@
                             document.addEventListener("DOMContentLoaded", function () {
                                 loadSelectionFromStorage();
                                 loadNotesFromStorage();
+                                initOrderData();
 
                                 // Đọc danh sách ảnh được chia sẻ qua URL (?picks=...)
                                 const urlParams = new URLSearchParams(window.location.search);
@@ -1352,11 +1970,7 @@
                                     selectedItems.clear();
                                     document.querySelectorAll('.photo-card.selected').forEach(c => c.classList.remove('selected'));
 
-                                    function cleanPhotoName(n) {
-                                        if (!n && n !== 0) return '';
-                                        return decodeURIComponent(String(n)).trim().toLowerCase().replace(/\.[a-zA-Z0-9]{2,5}$/, '');
-                                    }
-                                    const rawTokens = picks.split(/[,;\s]+|(?:\s+or\s+)/i).map(p => p.trim()).filter(Boolean);
+                                    const rawTokens = picks.split(/\s*,+\s*|\s+or\s+/i).map(p => p.trim()).filter(Boolean);
                                     const pickedCleanSet = new Set(rawTokens.map(p => cleanPhotoName(p)).filter(Boolean));
                                     const pickedRawSet = new Set(rawTokens.map(p => decodeURIComponent(String(p)).trim().toLowerCase()).filter(Boolean));
                                     
@@ -1401,11 +2015,25 @@
                                         if (cleanPath === '') cleanPath = '/';
                                         let newSearch = '?id=' + encodeURIComponent(FOLDER_ID);
                                         if (picks) newSearch += '&picks=' + encodeURIComponent(picks);
+                                        const curOid = urlParams.get('orderId');
+                                        if (curOid) newSearch += '&orderId=' + encodeURIComponent(curOid);
                                         window.history.replaceState(null, '', cleanPath + newSearch);
                                     } catch (e) {
                                         console.warn("Lỗi cập nhật URL", e);
                                     }
                                 }
+
+                                // Bấm ra ngoài để cất bảng ghi chú nổi (nếu đang mở)
+                                document.addEventListener("click", function(e) {
+                                    const panel = document.getElementById("floatingCommentsPanel");
+                                    const btn = document.getElementById("btnFloatingComments");
+                                    const bannerBtn = document.getElementById("btnBannerViewNotes");
+                                    if (!panel || panel.style.display === "none") return;
+                                    if (panel.contains(e.target) || (btn && btn.contains(e.target)) || (bannerBtn && bannerBtn.contains(e.target))) {
+                                        return;
+                                    }
+                                    panel.style.display = "none";
+                                });
                             });
 
                             // ====================================================
@@ -1749,7 +2377,7 @@
                                 // Cập nhật ô ghi chú cho ảnh hiện tại
                                 const noteInput = document.getElementById("modalPhotoNoteInput");
                                 const clearBtn = document.getElementById("btnClearPhotoNote");
-                                const currentNote = (photoNotes && photoNotes[imgData.name]) ? photoNotes[imgData.name] : "";
+                                const currentNote = getNoteForPhoto(imgData.name);
                                 if (noteInput) {
                                     noteInput.value = currentNote;
                                 }
@@ -2022,6 +2650,12 @@
                                 const btn = document.getElementById('btnShowSelected');
                                 const allCols = document.querySelectorAll('#galleryContainer > div:not(#noSearchResultMsg)');
                                 const countBadge = document.getElementById('totalImgBadge');
+                                const noResultMsg = document.getElementById('noSearchResultMsg');
+
+                                // Nếu đang lọc ảnh ghi chú, tắt đi để chuyển sang xem ảnh đã chọn
+                                if (isShowingSelectedOnly && isShowingNotedOnly) {
+                                    resetNotedFilterButtons();
+                                }
 
                                 if (isShowingSelectedOnly) {
                                     btn.classList.remove('btn-outline-info');
@@ -2039,12 +2673,15 @@
                                         }
                                     });
                                     if (countBadge) countBadge.innerText = countSelected;
+                                    if (noResultMsg) noResultMsg.style.display = (countSelected === 0) ? 'block' : 'none';
                                 } else {
                                     btn.classList.add('btn-outline-info');
                                     btn.classList.remove('btn-info');
                                     btn.innerHTML = '<i class="bi bi-funnel me-1"></i> Xem ảnh đã chọn';
 
                                     allCols.forEach(col => col.classList.remove('d-none'));
+                                    if (noResultMsg) noResultMsg.style.display = 'none';
+
                                     const filterInput = document.getElementById('txtFilterInput') || document.querySelector('input[name="txtFilter"]');
                                     if (filterInput && filterInput.value.trim() !== "") {
                                         filterInput.dispatchEvent(new Event('input'));
@@ -2054,9 +2691,103 @@
                                 }
                             }
 
+                            // Chức năng lọc chỉ xem các ảnh có ghi chú dặn dò (Dành cho thợ Retouch & Studio)
+                            function toggleShowNotedOnly() {
+                                isShowingNotedOnly = !isShowingNotedOnly;
+                                const btn = document.getElementById('btnShowNoted');
+                                const bannerBtn = document.getElementById('btnBannerFilterNoted');
+                                const allCols = document.querySelectorAll('#galleryContainer > div:not(#noSearchResultMsg)');
+                                const countBadge = document.getElementById('totalImgBadge');
+                                const noResultMsg = document.getElementById('noSearchResultMsg');
+
+                                // Nếu đang xem ảnh đã chọn, tắt đi để ưu tiên hiển thị các ảnh có ghi chú
+                                if (isShowingNotedOnly && isShowingSelectedOnly) {
+                                    isShowingSelectedOnly = false;
+                                    const selBtn = document.getElementById('btnShowSelected');
+                                    if (selBtn) {
+                                        selBtn.classList.add('btn-outline-info');
+                                        selBtn.classList.remove('btn-info');
+                                        selBtn.innerHTML = '<i class="bi bi-funnel me-1"></i> Xem ảnh đã chọn';
+                                    }
+                                }
+
+                                if (isShowingNotedOnly) {
+                                    if (btn) {
+                                        btn.classList.remove('btn-outline-warning');
+                                        btn.classList.add('btn-warning', 'text-dark', 'fw-bold');
+                                        btn.innerHTML = '<i class="bi bi-eye-slash-fill me-1"></i> Hiện tất cả ảnh';
+                                    }
+                                    if (bannerBtn) {
+                                        bannerBtn.classList.remove('btn-outline-warning');
+                                        bannerBtn.classList.add('btn-warning', 'text-dark', 'fw-bold');
+                                        bannerBtn.innerHTML = '<i class="bi bi-eye-slash-fill me-1"></i> Hiện tất cả';
+                                    }
+
+                                    let countNoted = 0;
+                                    allCols.forEach(col => {
+                                        const card = col.querySelector('.photo-card');
+                                        const photoName = card ? card.getAttribute('data-name') : '';
+                                        const note = getNoteForPhoto(photoName);
+                                        if (note && note.trim().length > 0) {
+                                            col.classList.remove('d-none');
+                                            countNoted++;
+                                        } else {
+                                            col.classList.add('d-none');
+                                        }
+                                    });
+
+                                    if (countBadge) countBadge.innerText = countNoted;
+                                    if (noResultMsg) {
+                                        if (countNoted === 0) {
+                                            noResultMsg.style.display = 'block';
+                                            const title = noResultMsg.querySelector('h5');
+                                            const sub = noResultMsg.querySelector('p');
+                                            if (title) title.innerText = 'Chưa có ảnh nào có ghi chú dặn dò';
+                                            if (sub) sub.innerText = 'Khách chưa để lại ghi chú riêng cho bức ảnh nào trong album này.';
+                                        } else {
+                                            noResultMsg.style.display = 'none';
+                                        }
+                                    }
+                                } else {
+                                    resetNotedFilterButtons();
+                                    allCols.forEach(col => col.classList.remove('d-none'));
+                                    if (noResultMsg) noResultMsg.style.display = 'none';
+
+                                    const filterInput = document.getElementById('txtFilterInput') || document.querySelector('input[name="txtFilter"]');
+                                    if (filterInput && filterInput.value.trim() !== "") {
+                                        filterInput.dispatchEvent(new Event('input'));
+                                    } else if (countBadge && typeof allImagesData !== 'undefined') {
+                                        countBadge.innerText = allImagesData.length;
+                                    }
+                                }
+                            }
+
+                            function resetNotedFilterButtons() {
+                                isShowingNotedOnly = false;
+                                let noteKeys = [];
+                                if (photoNotes && typeof photoNotes === 'object') {
+                                    noteKeys = Object.keys(photoNotes).filter(k => photoNotes[k] && String(photoNotes[k]).trim().length > 0);
+                                }
+                                const btn = document.getElementById('btnShowNoted');
+                                if (btn) {
+                                    btn.classList.add('btn-outline-warning');
+                                    btn.classList.remove('btn-warning', 'text-dark', 'fw-bold');
+                                    btn.innerHTML = '<i class="bi bi-chat-left-dots-fill me-1"></i> Ảnh có ghi chú <span id="badgeBtnShowNoted" class="badge bg-warning text-dark rounded-pill ms-1" style="' + (noteKeys.length > 0 ? '' : 'display:none;') + '">' + noteKeys.length + '</span>';
+                                }
+                                const bannerBtn = document.getElementById('btnBannerFilterNoted');
+                                if (bannerBtn) {
+                                    bannerBtn.classList.add('btn-outline-warning');
+                                    bannerBtn.classList.remove('btn-warning', 'text-dark', 'fw-bold');
+                                    bannerBtn.innerHTML = '<i class="bi bi-funnel me-1"></i> Lọc ảnh ghi chú (' + noteKeys.length + ')';
+                                }
+                            }
+
                             function showAllPhotosFromBanner() {
                                 if (isShowingSelectedOnly) {
                                     toggleShowSelectedOnly();
+                                }
+                                if (isShowingNotedOnly) {
+                                    toggleShowNotedOnly();
                                 }
                             }
 
@@ -2269,6 +3000,7 @@
                                     delete photoNotes[imgData.name];
                                 }
                                 saveNotesToStorage();
+                                updateFloatingCommentUI();
                                 const clearBtn = document.getElementById("btnClearPhotoNote");
                                 if (clearBtn) clearBtn.style.display = trimmed ? "block" : "none";
                                 const noteBadge = document.getElementById("card-note-badge-" + currentImageIndex);
@@ -2481,6 +3213,12 @@
                                     localStorage.setItem("latest_submitted_order_" + FOLDER_ID, JSON.stringify(orderData));
                                     localStorage.setItem("order_sub_" + FOLDER_ID + "_" + now.getTime(), JSON.stringify(orderData));
                                 } catch (e) {}
+
+                                currentClientName = name;
+                                currentClientPhone = phone;
+                                currentGeneralNote = noteInput.value.trim();
+                                currentOrderId = orderId;
+                                updateFloatingCommentUI();
 
                                 // 1. Tự động lưu đơn chốt về Máy Chủ Trung Tâm (Central Server - Hoạt động trên mọi thiết bị & Facebook)
                                 try {

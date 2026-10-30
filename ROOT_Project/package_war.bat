@@ -5,28 +5,19 @@ echo    DONG GOI DU AN THANH FILE ROOT.war
 echo ======================================================
 
 echo.
-echo [BƯỚC 1/2] Đồng bộ cơ sở dữ liệu sống từ máy chủ trước khi đóng gói...
+echo [BUOC 1/2] Dong bo co so du lieu song tu may chu...
 if exist "sync_live_data.ps1" (
     powershell -ExecutionPolicy Bypass -File ".\sync_live_data.ps1"
 )
 echo.
 
-set "JAR_CMD=jar"
-where jar >nul 2>nul
-if %errorlevel% neq 0 (
-    if exist "C:\Program Files\Java\jdk-21\bin\jar.exe" (
-        set "JAR_CMD=C:\Program Files\Java\jdk-21\bin\jar.exe"
-    ) else if exist "C:\Program Files\Java\jdk-23\bin\jar.exe" (
-        set "JAR_CMD=C:\Program Files\Java\jdk-23\bin\jar.exe"
-    )
-)
+set "JAR_CMD="
+if exist "C:\Program Files\Java\jdk-21\bin\jar.exe" set "JAR_CMD=C:\Program Files\Java\jdk-21\bin\jar.exe"
+if not defined JAR_CMD if exist "C:\Program Files\Java\jdk-23\bin\jar.exe" set "JAR_CMD=C:\Program Files\Java\jdk-23\bin\jar.exe"
+if not defined JAR_CMD set "JAR_CMD=jar"
 
-echo [BƯỚC 2/2] Đang đóng gói ROOT.war với cơ sở dữ liệu mới nhất...
-if defined JAR_CMD (
-    "%JAR_CMD%" -cvf ROOT.war index.jsp tc.jsp admin.jsp admin.html tuan.jpg WEB-INF META-INF
-) else (
-    powershell -Command "Compress-Archive -Path 'index.jsp', 'tc.jsp', 'admin.jsp', 'admin.html', 'tuan.jpg', 'WEB-INF', 'META-INF' -DestinationPath 'ROOT.zip' -Force; Move-Item -Path 'ROOT.zip' -Destination 'ROOT.war' -Force"
-)
+echo [BUOC 2/2] Dang dong goi ROOT.war voi co so du lieu moi nhat...
+"%JAR_CMD%" -cvf ROOT.war index.jsp tc.jsp admin.jsp admin.html tuan.jpg WEB-INF META-INF
 
 if %errorlevel% equ 0 (
     copy /y ROOT.war "..\ROOT.war" >nul
