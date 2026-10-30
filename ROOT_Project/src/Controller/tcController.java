@@ -183,7 +183,7 @@ public class tcController extends HttpServlet {
                 }
             } catch (Exception ignored) {}
         }
-        if (file != null) {
+        if (file != null && !ORDER_STORE.isEmpty()) {
             saveOrdersToFile(file);
         }
         ordersInitialized = true;
@@ -240,6 +240,14 @@ public class tcController extends HttpServlet {
     }
 
     private static void parseOrdersJsonString(String json) {
+        if (json == null) return;
+        json = json.trim();
+        while (json.startsWith("\uFEFF")) {
+            json = json.substring(1).trim();
+        }
+        if (json.startsWith("{") && json.endsWith("]")) {
+            json = "[" + json;
+        }
         if (json.startsWith("[") && json.endsWith("]")) {
             ORDER_STORE.clear();
             int depth = 0;
@@ -491,6 +499,14 @@ public class tcController extends HttpServlet {
     }
 
     private static void parseAlbumsJsonString(String json) {
+        if (json == null) return;
+        json = json.trim();
+        while (json.startsWith("\uFEFF")) {
+            json = json.substring(1).trim();
+        }
+        if (json.startsWith("{") && json.endsWith("]")) {
+            json = "[" + json;
+        }
         if (json.startsWith("[") && json.endsWith("]")) {
             CUSTOM_ALBUMS.clear();
             int depth = 0;

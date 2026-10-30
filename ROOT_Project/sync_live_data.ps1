@@ -11,6 +11,7 @@ if (!(Test-Path $backupDir)) {
 }
 
 $nowStr = Get-Date -Format "yyyyMMdd_HHmmss"
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
 # 1. Sao luu ban hien tai trong may truoc de phong rui ro
 $localOrdersPath = Join-Path $webInfDir "orders.json"
@@ -32,26 +33,35 @@ Write-Host "======================================================" -ForegroundC
 # 2. Hop nhat Don Hang (Orders) thong minh
 try {
     Write-Host "-> Dang kiem tra danh sach Don Hang song tu server..."
-    $ordersRaw = curl.exe -s --max-time 15 "$liveBase/tcController?action=getOrders"
-    
     $localOrders = @()
     if (Test-Path $localOrdersPath) {
         try {
-            $localRaw = Get-Content $localOrdersPath -Raw
-            if ($localRaw -and $localRaw.Trim().StartsWith("[")) {
+            $localRaw = [System.IO.File]::ReadAllText($localOrdersPath, [System.Text.Encoding]::UTF8).Trim().Trim([char]0xFEFF)
+            if ($localRaw -and $localRaw.StartsWith("[")) {
                 $localOrders = $localRaw | ConvertFrom-Json
             }
-        } catch {}
+        } catch {
+            Write-Host "   [CANH BAO] Khong doc duoc local orders: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
     }
 
     $allOrdersMap = [ordered]@{}
-    if ($ordersRaw -and $ordersRaw.Trim().StartsWith("[") -and $ordersRaw.Trim().EndsWith("]")) {
-        $liveOrders = $ordersRaw | ConvertFrom-Json
-        foreach ($o in $liveOrders) {
-            $k = if ($o.orderId) { $o.orderId } else { $o.time }
-            if ($k) { $allOrdersMap[$k] = $o }
+    # Doc tu live truoc neu co
+    try {
+        $ordersRaw = curl.exe -s --max-time 15 "$liveBase/tcController?action=getOrders"
+        if ($ordersRaw) {
+            $ordersRawClean = $ordersRaw.Trim().Trim([char]0xFEFF)
+            if ($ordersRawClean.StartsWith("[") -and $ordersRawClean.EndsWith("]")) {
+                $liveOrders = $ordersRawClean | ConvertFrom-Json
+                foreach ($o in $liveOrders) {
+                    $k = if ($o.orderId) { $o.orderId } else { $o.time }
+                    if ($k) { $allOrdersMap[$k] = $o }
+                }
+            }
         }
-    }
+    } catch {}
+
+    # Hop nhat voi local (khong lam mat bat ky don nao)
     foreach ($o in $localOrders) {
         $k = if ($o.orderId) { $o.orderId } else { $o.time }
         if ($k -and -not $allOrdersMap.Contains($k)) {
@@ -64,7 +74,11 @@ try {
         for ($i = 0; $i -lt $mergedOrders.Count; $i++) {
             $mergedOrders[$i].rowIndex = $i + 1
         }
-        [System.IO.File]::WriteAllText($localOrdersPath, ($mergedOrders | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
+        $jsonOrders = $mergedOrders | ConvertTo-Json -Depth 10
+        if (-not $jsonOrders.Trim().StartsWith("[")) {
+            $jsonOrders = "[" + "`r`n" + $jsonOrders + "`r`n" + "]"
+        }
+        [System.IO.File]::WriteAllText($localOrdersPath, $jsonOrders, $utf8NoBom)
         Write-Host "   [OK] Da hop nhat thanh cong $($mergedOrders.Count) don hang." -ForegroundColor Green
     }
 } catch {
@@ -77,11 +91,13 @@ try {
     $localAlbums = @()
     if (Test-Path $localAlbumsPath) {
         try {
-            $localARaw = Get-Content $localAlbumsPath -Raw
-            if ($localARaw -and $localARaw.Trim().StartsWith("[")) {
+            $localARaw = [System.IO.File]::ReadAllText($localAlbumsPath, [System.Text.Encoding]::UTF8).Trim().Trim([char]0xFEFF)
+            if ($localARaw -and $localARaw.StartsWith("[")) {
                 $localAlbums = $localARaw | ConvertFrom-Json
             }
-        } catch {}
+        } catch {
+            Write-Host "   [CANH BAO] Khong doc duoc local albums: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
     }
 
     $allAlbumsMap = [ordered]@{}
@@ -90,20 +106,29 @@ try {
         if ($k) { $allAlbumsMap[$k] = $a }
     }
 
-    $albumsRaw = curl.exe -s --max-time 15 "$liveBase/tcController?action=getAlbums"
-    if ($albumsRaw -and $albumsRaw.Trim().StartsWith("[") -and $albumsRaw.Trim().EndsWith("]")) {
-        $liveAlbums = $albumsRaw | ConvertFrom-Json
-        foreach ($a in $liveAlbums) {
-            $k = if ($a.id) { $a.id } else { $a.folderId }
-            if ($k -and -not $allAlbumsMap.Contains($k)) {
-                $allAlbumsMap[$k] = $a
+    try {
+        $albumsRaw = curl.exe -s --max-time 15 "$liveBase/tcController?action=getAlbums"
+        if ($albumsRaw) {
+            $albumsRawClean = $albumsRaw.Trim().Trim([char]0xFEFF)
+            if ($albumsRawClean.StartsWith("[") -and $albumsRawClean.EndsWith("]")) {
+                $liveAlbums = $albumsRawClean | ConvertFrom-Json
+                foreach ($a in $liveAlbums) {
+                    $k = if ($a.id) { $a.id } else { $a.folderId }
+                    if ($k -and -not $allAlbumsMap.Contains($k)) {
+                        $allAlbumsMap[$k] = $a
+                    }
+                }
             }
         }
-    }
+    } catch {}
 
     $mergedAlbums = @($allAlbumsMap.Values)
     if ($mergedAlbums.Count -gt 0) {
-        [System.IO.File]::WriteAllText($localAlbumsPath, ($mergedAlbums | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
+        $jsonAlbums = $mergedAlbums | ConvertTo-Json -Depth 10
+        if (-not $jsonAlbums.Trim().StartsWith("[")) {
+            $jsonAlbums = "[" + "`r`n" + $jsonAlbums + "`r`n" + "]"
+        }
+        [System.IO.File]::WriteAllText($localAlbumsPath, $jsonAlbums, $utf8NoBom)
         Write-Host "   [OK] Da hop nhat thanh cong $($mergedAlbums.Count) album." -ForegroundColor Green
     }
 } catch {
