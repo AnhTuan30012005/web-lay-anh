@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
     <%@ page import="java.util.List" %>
         <%@ page import="java.util.ArrayList" %>
             <%@ page import="java.net.URLEncoder" %>
@@ -1871,15 +1871,13 @@
                                             noteKeys.forEach(k => {
                                                 const comment = photoNotes[k];
                                                 const cleanName = cleanPhotoName(k);
-                                                html += `
-                                                    <div class="panel-note-item" onclick="openPhotoByName('${escapeJs(k)}')" title="Bấm để mở xem ảnh này">
-                                                        <div class="panel-note-item-top">
-                                                            <span class="panel-note-photo-name"><i class="bi bi-image text-info"></i> ${escapeHtml(k)}</span>
-                                                            <span class="panel-note-action-hint"><i class="bi bi-box-arrow-up-right"></i> Xem ảnh</span>
-                                                        </div>
-                                                        <div class="panel-note-text">"${escapeHtml(comment)}"</div>
-                                                    </div>
-                                                `;
+                                                html += '<div class="panel-note-item" onclick="openPhotoByName(\'' + escapeJs(k) + '\')" title="Bấm để mở xem ảnh này">'
+                                                    + '<div class="panel-note-item-top">'
+                                                    + '<span class="panel-note-photo-name"><i class="bi bi-image text-info"></i> ' + escapeHtml(k) + '</span>'
+                                                    + '<span class="panel-note-action-hint"><i class="bi bi-box-arrow-up-right"></i> Xem ảnh</span>'
+                                                    + '</div>'
+                                                    + '<div class="panel-note-text">"' + escapeHtml(comment) + '"</div>'
+                                                    + '</div>';
                                             });
                                             listEl.innerHTML = html;
                                         }

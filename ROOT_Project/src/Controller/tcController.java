@@ -544,6 +544,9 @@ public class tcController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
         String txtLink = request.getParameter("txtLink");     // Link thư mục Google Drive hoặc ID
         if (txtLink == null || txtLink.trim().isEmpty()) {
             txtLink = request.getParameter("id");             // Hỗ trợ rút gọn: ?id=...
@@ -877,20 +880,12 @@ public class tcController extends HttpServlet {
         ensureAlbumsLoaded(request);
         ensureOrdersLoaded(request);
 
-        // Tìm đơn chốt ảnh tương ứng (nếu có orderId hoặc folderId) để truyền comment / ghi chú sang tc.jsp
+        // Tìm đơn chốt ảnh tương ứng (nếu có orderId) để truyền comment / ghi chú sang tc.jsp
         String reqOrderId = request.getParameter("orderId");
         OrderRecord matchedOrder = null;
         if (reqOrderId != null && !reqOrderId.trim().isEmpty()) {
             for (OrderRecord o : ORDER_STORE) {
                 if (reqOrderId.trim().equalsIgnoreCase(o.orderId)) {
-                    matchedOrder = o;
-                    break;
-                }
-            }
-        }
-        if (matchedOrder == null && folderId != null && !folderId.trim().isEmpty()) {
-            for (OrderRecord o : ORDER_STORE) {
-                if (folderId.trim().equalsIgnoreCase(o.folderId)) {
                     matchedOrder = o;
                     break;
                 }
